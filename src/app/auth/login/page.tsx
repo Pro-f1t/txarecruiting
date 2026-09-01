@@ -1,14 +1,29 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { signInWithGoogle, signOutClient } from "@/lib/firebase/auth";
+
+// In-app browsers (Instagram, TikTok, Snapchat, Facebook…) partition storage,
+// which breaks Google/Firebase sign-in. Detect them so we can tell the user to
+// open the page in Safari/Chrome instead.
+function isInAppBrowser(): boolean {
+  if (typeof navigator === "undefined") return false;
+  const ua = navigator.userAgent || "";
+  return /FBAN|FBAV|FB_IAB|Instagram|Line\/|TikTok|musical_ly|BytedanceWebview|Snapchat|Pinterest|LinkedInApp|GSA\//i.test(ua);
+}
 
 function LoginForm() {
   const router = useRouter();
   const params = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [inApp, setInApp] = useState(false);
+  const isIOS = typeof navigator !== "undefined" && /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  useEffect(() => {
+    setInApp(isInAppBrowser());
+  }, []);
 
   const handleLogin = async () => {
     setLoading(true);
@@ -45,6 +60,20 @@ function LoginForm() {
         <p className="t-body mt-2 text-muted">
           Access your dashboard or start an application.
         </p>
+
+        {inApp && (
+          <div
+            className="mt-5 rounded-2xl p-4 text-[13px]"
+            style={{ background: "rgba(96,165,250,0.1)", border: "1px solid rgba(96,165,250,0.35)" }}
+          >
+            <p className="font-semibold text-white">Open in your browser to sign in</p>
+            <p className="mt-1 text-muted">
+              You&apos;re in an in-app browser (Instagram/TikTok), where Google sign-in is blocked. Tap the{" "}
+              <span className="text-white">{isIOS ? "••• menu at the top-right" : "⋮ menu at the top-right"}</span>{" "}
+              and choose <span className="text-white">{isIOS ? "“Open in Safari”" : "“Open in Chrome” / “Open in browser”"}</span>, then sign in there.
+            </p>
+          </div>
+        )}
 
         <button
           onClick={handleLogin}
