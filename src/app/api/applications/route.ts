@@ -1,16 +1,12 @@
 import { NextResponse } from "next/server";
 import { requireUser, guardErrorStatus } from "@/lib/auth/guard";
 import { upsertApplication, getUserApplication } from "@/lib/firebase/applications";
+import { applicationsClosed } from "@/lib/applicationsOpen";
 import { ApplicationFormData } from "@/lib/models/Application";
 import { Team, TEAMS } from "@/lib/models/User";
-import { EVENTS } from "@/data/events";
 
 const clip = (v: unknown, n = 20000) => (typeof v === "string" ? v.slice(0, n) : "");
 const NAMED = ["phone", "major", "major2", "graduationYear", "resumeUrl", "whyJoin", "project", "imageUrl", "otherCommitments", "questionsForUs"] as const;
-
-// The application close date — after this the application is read-only.
-const DEADLINE = new Date(EVENTS.find((e) => e.type === "deadline")?.startsAt ?? "2026-09-12T23:59:00-05:00");
-const pastDeadline = () => Date.now() > DEADLINE.getTime();
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function sanitizeFormData(input: any): ApplicationFormData {
@@ -41,7 +37,8 @@ function validTeams(v: unknown): Team[] {
 export async function GET() {
   try {
     const { uid } = await requireUser();
-    return NextResponse.json({ application: await getUserApplication(uid), editable: !pastDeadline() });
+    const [application, closed] = await Promise.all([getUserApplication(uid), applicationsClosed()]);
+    return NextResponse.json({ application, editable: !closed });
   } catch (error) {
     return NextResponse.json({ error: "Unable to load application." }, { status: guardErrorStatus(error) ?? 500 });
   }
@@ -51,8 +48,8 @@ export async function POST(request: Request) {
   try {
     const { uid, user } = await requireUser();
 
-    if (pastDeadline()) {
-      return NextResponse.json({ error: "Applications are closed — the deadline has passed." }, { status: 403 });
+    if (await applicationsClosed()) {
+      return NextResponse.json({ error: "Applications are closed — the review period has begun." }, { status: 403 });
     }
 
     let body: { memberTeams?: unknown; leadTeams?: unknown; formData?: unknown; draft?: unknown };

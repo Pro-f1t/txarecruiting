@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { requireUser } from "@/lib/auth/guard";
 import { getUserApplication } from "@/lib/firebase/applications";
+import { applicationsClosed } from "@/lib/applicationsOpen";
 import { EVENTS, SEASON } from "@/data/events";
 import { FIELD_TEAMS } from "@/data/fieldTeams";
 import ApplyForm from "@/components/ApplyForm";
@@ -16,13 +18,29 @@ export default async function ApplyPage() {
   const attended = new Set(user.attendedEventIds ?? []);
   const infoAttended = EVENTS.some((e) => e.type === "info_session" && attended.has(e.id));
 
-  const deadline = new Date(EVENTS.find((e) => e.type === "deadline")?.startsAt ?? "2026-09-12T23:59:00-05:00");
-  const editable = Date.now() <= deadline.getTime();
-
-  const app = await getUserApplication(uid);
+  const [closed, app] = await Promise.all([applicationsClosed(), getUserApplication(uid)]);
+  const editable = !closed;
   const prefill = app
     ? { memberTeams: app.memberTeams, leadTeams: app.leadTeams, formData: app.formData as unknown as Record<string, unknown>, status: app.status }
     : null;
+
+  if (closed) {
+    return (
+      <section className="shell pt-28 pb-24">
+        <p className="t-eyebrow">{SEASON} application</p>
+        <h1 className="h-display mt-3 max-w-[20ch]">Applications are closed</h1>
+        <div className="card mt-8 max-w-[60ch] p-7">
+          <span className="badge badge-danger">Closed</span>
+          <p className="t-body mt-4 text-muted">
+            {app
+              ? "The review period has begun, so applications can no longer be edited. You can track your status on your dashboard."
+              : "The application window is closed and no longer accepting submissions. Thanks for your interest in Texas Accelerate."}
+          </p>
+          <Link href="/dashboard" className="pill pill-blue mt-6">Go to dashboard</Link>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="shell pt-28 pb-24">
