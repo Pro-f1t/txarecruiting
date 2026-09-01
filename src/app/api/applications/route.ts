@@ -74,6 +74,12 @@ export async function POST(request: Request) {
       if (!formData.whyJoin || !formData.project) {
         return NextResponse.json({ error: "Please answer both required questions." }, { status: 400 });
       }
+      if (!formData.imageUrl) {
+        return NextResponse.json({ error: "Please upload an image that appeals to you." }, { status: 400 });
+      }
+      if (!formData.otherCommitments) {
+        return NextResponse.json({ error: "Please list your other major commitments for the semester." }, { status: 400 });
+      }
       if (leadTeams.length > 0) {
         if (!formData.leadAnswers?.leadExperience) {
           return NextResponse.json({ error: "Please answer the leadership experience question." }, { status: 400 });

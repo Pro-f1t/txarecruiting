@@ -90,6 +90,8 @@ export default function ApplyForm({
     if (!f.resumeUrl) return "Please upload your resume (PDF).";
     if (!f.whyJoin?.trim() || !f.project?.trim()) return "Please answer both required questions.";
     if (whyWords > 150 || projWords > 150) return "Keep the two main answers under 150 words.";
+    if (!f.imageUrl) return "Please upload an image that appeals to you.";
+    if (!f.otherCommitments?.trim()) return "Please list your other major commitments for the semester.";
     if (applyLead) {
       if (leadTeams.length === 0) return "Pick at least one field team to lead.";
       if (!lead.leadExperience?.trim()) return "Please answer the leadership experience question.";
@@ -316,12 +318,12 @@ export default function ApplyForm({
         />
         <div className="block">
           <span className="mb-2 block text-[14px] font-medium">
-            Upload something that appeals to you — share something about yourself, your interests, or what is meaningful to you. This is open-ended — have fun! <span className="text-muted">(PNG, JPEG, or PDF)</span> <Req />
+            Upload an image that appeals to you — share something about yourself, your interests, or what is meaningful to you. This is open-ended — have fun! <span className="text-muted">(PNG or JPEG)</span> <Req />
           </span>
           <div className="flex items-center gap-3 rounded-2xl px-4 py-3" style={fieldStyle}>
             <label className="cursor-pointer shrink-0">
               <span className="pill pill-ghost !px-3 !py-1.5 !text-[13px]">{f.imageUrl ? "Replace file" : "Choose file"}</span>
-              <input type="file" accept="image/png,image/jpeg,application/pdf,.png,.jpg,.jpeg,.pdf" className="hidden"
+              <input type="file" accept="image/png,image/jpeg,.png,.jpg,.jpeg" className="hidden"
                 onChange={(e) => e.target.files?.[0] && upload("images", e.target.files[0], setImageName, "imageUrl")} />
             </label>
             {f.imageUrl ? (
@@ -333,7 +335,7 @@ export default function ApplyForm({
             )}
           </div>
         </div>
-        <Long label="What are your other major commitments for the semester? (optional)" value={f.otherCommitments ?? ""} onChange={(v) => set("otherCommitments", v)} />
+        <Long label="What are your other major commitments for the semester?" value={f.otherCommitments ?? ""} onChange={(v) => set("otherCommitments", v)} required />
         <Long label="Any questions for us? (optional)" value={f.questionsForUs ?? ""} onChange={(v) => set("questionsForUs", v)} />
       </div>
 
