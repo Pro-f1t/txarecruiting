@@ -1,0 +1,21 @@
+/node_modules
+/.next/
+/out/
+/build
+.DS_Store
+*.pem
+# Firebase Admin service-account keys — SECRET, never commit
+*adminsdk*.json
+*service-account*.json
+serviceAccountKey.json
+npm-debug.log*
+.env*
+.vercel
+*.tsbuildinfo
+next-env.d.ts
+/.claude/
+CLAUDE.md
+* 2.*
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
