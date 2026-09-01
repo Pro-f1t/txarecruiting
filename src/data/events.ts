@@ -28,3 +28,18 @@ export const EVENT_TYPE_LABEL: Record<EventType, string> = {
   coffee_chat: "Coffee Chat",
   deadline: "Deadline",
 };
+
+// The check-in event live right now: its window runs from 30 min before start
+// to 90 min after. Deadlines never count. Used by /live/now so the display
+// picks the session itself — impossible to check people into the wrong one.
+const LIVE_LEAD_MS = 30 * 60 * 1000;
+const LIVE_TAIL_MS = 90 * 60 * 1000;
+
+export function currentLiveEvent(now = Date.now()): RecruitingEvent | null {
+  for (const e of EVENTS) {
+    if (e.type === "deadline") continue;
+    const start = new Date(e.startsAt).getTime();
+    if (now >= start - LIVE_LEAD_MS && now <= start + LIVE_TAIL_MS) return e;
+  }
+  return null;
+}

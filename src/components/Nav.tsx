@@ -75,6 +75,9 @@ export default function Nav() {
     return () => document.removeEventListener("mousedown", onDown);
   }, [menuOpen]);
 
+  // The live check-in display is a full-screen projected surface — no nav.
+  if (pathname.startsWith("/live")) return null;
+
   const signedIn = !!role;
   const isStaff = STAFF_ROLES.includes(role || "");
   const logoHref = isStaff ? "/admin" : "/";

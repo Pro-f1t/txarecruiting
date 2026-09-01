@@ -17,8 +17,14 @@ export function proxy(request: NextRequest) {
     pathname.startsWith("/apply") ||
     pathname.startsWith("/admin");
 
-  // Not signed in → send to login, preserving where they were headed (used by
-  // the QR attendance flow so a scan lands on /attend/... after login).
+  // Not signed in → send to login, preserving where they were headed (so a QR
+  // scan lands back on /checkin/... after login).
+  //
+  // NOTE: the rotating check-in routes /c/... and /live/... are intentionally
+  // NOT in the matcher below. /c/ must run its token->pass handoff before any
+  // login redirect (a matched path would bounce a signed-out scanner to login
+  // first and the token would die during the Google flow), and /live/ is the
+  // AV-laptop display that has no session. Do not add them to the matcher.
   if (!session && isProtected) {
     const url = new URL("/auth/login", request.url);
     url.searchParams.set("next", pathname + request.nextUrl.search);
