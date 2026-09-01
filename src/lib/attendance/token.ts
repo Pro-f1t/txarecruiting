@@ -1,11 +1,11 @@
 import crypto from "crypto";
 
 // Rotating check-in tokens. Derived, not stored — any instance can verify one.
-//   bucket = floor(now / 5000)
+//   bucket = floor(now / 10000)
 //   token  = `${bucket}.${HMAC(secret, `${eventId}:${bucket}`).slice(0,16)}`
-// Verification accepts the current bucket ±1, so a code is valid ~5–10s.
+// Verification accepts the current bucket ±1, so a code is valid ~10–20s.
 
-const BUCKET_MS = 5000;
+const BUCKET_MS = 10000;
 const TOKEN_SIG_LEN = 16;
 const PASS_SIG_LEN = 24;
 const PASS_TTL_MS = 10 * 60 * 1000; // 10 min, scoped to one event

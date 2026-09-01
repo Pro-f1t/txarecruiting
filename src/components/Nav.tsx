@@ -64,7 +64,9 @@ export default function Nav() {
     } else {
       setMe(null);
     }
-  }, [pathname]);
+    // Once per load — role/name are stable within a session (sign-in/out and
+    // promotion both cause a full reload), so don't re-fetch on every nav.
+  }, []);
 
   useEffect(() => {
     if (!menuOpen) return;

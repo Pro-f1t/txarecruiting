@@ -3,7 +3,10 @@
 import { useMemo, useState } from "react";
 
 export type AttEvent = { id: string; title: string; type: string; date: string; day: string; location: string };
-export type AttUser = { uid: string; name: string; email: string; attendedEventIds: string[] };
+export type AttUser = { uid: string; name: string; email: string; role?: string; attendedEventIds: string[] };
+
+const STAFF_BADGE: Record<string, string> = { admin: "badge-ok", exec: "badge-warn" };
+const STAFF_LABEL: Record<string, string> = { admin: "Admin", exec: "Exec" };
 
 export default function AttendanceManager({ events, users }: { events: AttEvent[]; users: AttUser[] }) {
   const [eventId, setEventId] = useState(events[0]?.id ?? "");
@@ -98,7 +101,10 @@ export default function AttendanceManager({ events, users }: { events: AttEvent[
           return (
             <div key={u.uid} className="flex flex-wrap items-center justify-between gap-3 rounded-2xl p-4" style={{ background: "var(--color-surface)" }}>
               <div className="min-w-0">
-                <p className="truncate text-[15px] font-semibold">{u.name}</p>
+                <p className="truncate text-[15px] font-semibold">
+                  {u.name}
+                  {u.role && u.role !== "applicant" && <span className={`badge ${STAFF_BADGE[u.role] ?? "badge-muted"} ml-2 align-middle`}>{STAFF_LABEL[u.role] ?? u.role}</span>}
+                </p>
                 <p className="truncate text-[12px] text-muted">{u.email}</p>
               </div>
               <button

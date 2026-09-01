@@ -145,6 +145,7 @@ export default function DarkVeil({
 
     const start = performance.now();
     let frame = 0;
+    let onScreen = true;
 
     const loop = () => {
       program.uniforms.uTime.value = ((performance.now() - start) / 1000) * speed;
@@ -157,11 +158,24 @@ export default function DarkVeil({
       frame = requestAnimationFrame(loop);
     };
 
-    loop();
+    // Only burn GPU/CPU while the veil is actually on screen and the tab is
+    // visible — the footer veil sits off-screen on long pages and in background
+    // tabs, where a continuous WebGL loop is pure waste.
+    const active = () => onScreen && document.visibilityState === "visible";
+    const play = () => { if (!frame && active()) loop(); };
+    const pause = () => { if (frame) { cancelAnimationFrame(frame); frame = 0; } };
+    const sync = () => (active() ? play() : pause());
+
+    const io = new IntersectionObserver(([e]) => { onScreen = e.isIntersecting; sync(); });
+    io.observe(parent);
+    document.addEventListener("visibilitychange", sync);
+    sync();
 
     return () => {
-      cancelAnimationFrame(frame);
+      pause();
+      io.disconnect();
       ro.disconnect();
+      document.removeEventListener("visibilitychange", sync);
       window.removeEventListener('resize', resize);
     };
   }, [hueShift, noiseIntensity, scanlineIntensity, speed, scanlineFrequency, warpAmount, resolutionScale]);

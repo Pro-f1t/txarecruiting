@@ -9,8 +9,8 @@ function Shell({ children }: { children: React.ReactNode }) {
   return <section className="min-h-svh" style={{ background: "var(--color-bg)" }}>{children}</section>;
 }
 
-export default async function LiveNowPage({ searchParams }: { searchParams: Promise<{ k?: string; demo?: string }> }) {
-  const { k, demo } = await searchParams;
+export default async function LiveNowPage({ searchParams }: { searchParams: Promise<{ k?: string; event?: string }> }) {
+  const { k, event: eventParam } = await searchParams;
 
   if (!displayKeyOk(k)) {
     return (
@@ -23,12 +23,11 @@ export default async function LiveNowPage({ searchParams }: { searchParams: Prom
     );
   }
 
-  // Dev-only preview override (?demo=<eventId>); ignored in production so it
-  // can never surface a check-in code for a session that isn't live.
-  const demoEvent = process.env.NODE_ENV !== "production" && demo
-    ? EVENTS.find((e) => e.id === demo && e.type !== "deadline")
-    : undefined;
-  const event = demoEvent ?? currentLiveEvent();
+  // An explicit ?event=<id> (chosen by an exec on the console) overrides the
+  // auto-resolve. The display key already gates this surface, so overriding is
+  // a deliberate staff action; with no param it auto-picks the live session.
+  const chosen = eventParam ? EVENTS.find((e) => e.id === eventParam && e.type !== "deadline") : undefined;
+  const event = chosen ?? currentLiveEvent();
   if (!event) {
     return (
       <Shell>
