@@ -26,6 +26,7 @@ function FileLink({ label, url }: { label: string; url?: string }) {
 export default function ApplicationAnswers({ app, attendedEventIds = [] }: { app: Application; attendedEventIds?: string[] }) {
   const fd = app.formData;
   const major = [fd.major, fd.major2].filter(Boolean).join(" & ");
+  const fullName = [fd.firstName, fd.lastName].filter(Boolean).join(" ");
 
   const attended = EVENTS.filter((e) => e.type !== "deadline" && attendedEventIds.includes(e.id));
   const infoAttended = attended.some((e) => e.type === "info_session");
@@ -61,6 +62,7 @@ export default function ApplicationAnswers({ app, attendedEventIds = [] }: { app
       <div className="card p-7">
         <p className="t-eyebrow">Application</p>
         <div className="mt-5 grid gap-5 sm:grid-cols-2">
+          <QA label="Name" value={fullName || undefined} />
           <QA label="Major" value={major || undefined} />
           <QA label="Graduation year" value={fd.graduationYear} />
           <QA label="Phone" value={fd.phone} />

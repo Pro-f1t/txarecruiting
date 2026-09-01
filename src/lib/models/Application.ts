@@ -27,6 +27,8 @@ export interface LeadAnswers {
 
 export interface ApplicationFormData {
   // Identity
+  firstName?: string;
+  lastName?: string;
   phone?: string;
   major?: string;
   major2?: string;       // optional second major (double majors)

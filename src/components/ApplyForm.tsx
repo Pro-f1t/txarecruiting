@@ -86,6 +86,7 @@ export default function ApplyForm({
   };
 
   const validate = (): string | null => {
+    if (!f.firstName?.trim() || !f.lastName?.trim()) return "Please enter your first and last name.";
     if (memberTeams.length === 0 && leadTeams.length === 0) return "Choose at least one field team.";
     if (!f.resumeUrl) return "Please upload your resume (PDF).";
     if (!f.whyJoin?.trim() || !f.project?.trim()) return "Please answer both required questions.";
@@ -190,6 +191,14 @@ export default function ApplyForm({
       <div className="card p-7">
         <p className="t-eyebrow">About you</p>
         <div className="mt-5 grid gap-5 sm:grid-cols-2">
+          <label className="block">
+            <span className="mb-2 block text-[14px] font-medium">First name <Req /></span>
+            <input value={f.firstName ?? ""} onChange={(e) => set("firstName", e.target.value)} placeholder="First name" className={field} style={fieldStyle} />
+          </label>
+          <label className="block">
+            <span className="mb-2 block text-[14px] font-medium">Last name <Req /></span>
+            <input value={f.lastName ?? ""} onChange={(e) => set("lastName", e.target.value)} placeholder="Last name" className={field} style={fieldStyle} />
+          </label>
           <div className="block">
             <span className="mb-2 block text-[14px] font-medium">Major <Req /></span>
             <select value={f.major ?? ""} onChange={(e) => set("major", e.target.value)} className={field} style={fieldStyle}>

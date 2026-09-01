@@ -6,7 +6,7 @@ import { ApplicationFormData } from "@/lib/models/Application";
 import { Team, TEAMS } from "@/lib/models/User";
 
 const clip = (v: unknown, n = 20000) => (typeof v === "string" ? v.slice(0, n) : "");
-const NAMED = ["phone", "major", "major2", "graduationYear", "resumeUrl", "whyJoin", "project", "imageUrl", "otherCommitments", "questionsForUs"] as const;
+const NAMED = ["firstName", "lastName", "phone", "major", "major2", "graduationYear", "resumeUrl", "whyJoin", "project", "imageUrl", "otherCommitments", "questionsForUs"] as const;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function sanitizeFormData(input: any): ApplicationFormData {
@@ -62,6 +62,9 @@ export async function POST(request: Request) {
 
     // Save-progress (draft) skips completeness checks; a final submit enforces them.
     if (!draft) {
+      if (!formData.firstName || !formData.lastName) {
+        return NextResponse.json({ error: "Please enter your first and last name." }, { status: 400 });
+      }
       if (memberTeams.length === 0 && leadTeams.length === 0) {
         return NextResponse.json({ error: "Choose at least one field team." }, { status: 400 });
       }
@@ -88,8 +91,11 @@ export async function POST(request: Request) {
       }
     }
 
+    // Prefer the name the applicant typed (Google display names are unreliable
+    // now that any account can sign in); fall back to the Google name for drafts.
+    const providedName = [formData.firstName, formData.lastName].filter(Boolean).join(" ").trim();
     const app = await upsertApplication(
-      { userId: uid, userName: user.name, userEmail: user.email },
+      { userId: uid, userName: providedName || user.name, userEmail: user.email },
       { memberTeams, leadTeams, formData },
       !draft
     );
