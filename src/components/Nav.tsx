@@ -23,7 +23,7 @@ function readRoleCookie(): string | null {
   return m ? decodeURIComponent(m[1]) : null;
 }
 
-type Me = { name?: string; email?: string };
+type Me = { name?: string; email?: string; role?: string };
 
 /**
  * The marketing site's morphing nav bar DESIGN (transparent → glassy pill on
@@ -50,7 +50,16 @@ export default function Nav() {
     const r = readRoleCookie();
     setRole(r);
     if (r) {
-      fetch("/api/auth/me").then((res) => (res.ok ? res.json() : null)).then((d) => setMe(d?.user ?? null)).catch(() => {});
+      fetch("/api/auth/me")
+        .then((res) => (res.ok ? res.json() : null))
+        .then((d) => {
+          const u = d?.user ?? null;
+          setMe(u);
+          // The cookie role is stamped at sign-in and can be stale (e.g. promoted
+          // to admin mid-session). Trust the live role from the server.
+          if (u?.role) setRole(String(u.role).toLowerCase());
+        })
+        .catch(() => {});
     } else {
       setMe(null);
     }
