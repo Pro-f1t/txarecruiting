@@ -20,6 +20,11 @@ if (!firebase.apps.length) {
     }
     console.warn(`Firebase admin using emulators (firestore ${firestoreEmulator}, auth ${authEmulator})`);
     firebase.initializeApp({ projectId: EMULATOR_PROJECT_ID });
+  } else if (process.env.FIREBASE_SERVICE_ACCOUNT_B64) {
+    // Preferred for hosted deploys: the whole service-account JSON, base64-encoded
+    // into one line. Immune to the newline mangling that breaks a pasted PEM key.
+    const json = JSON.parse(Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT_B64, "base64").toString("utf8"));
+    firebase.initializeApp({ credential: firebase.credential.cert(json) });
   } else if (
     process.env.FIREBASE_PROJECT_ID &&
     process.env.FIREBASE_CLIENT_EMAIL &&
