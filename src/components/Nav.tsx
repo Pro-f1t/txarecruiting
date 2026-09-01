@@ -8,7 +8,8 @@ import { UserIcon, ChevronDown } from "./Icons";
 import { signOutClient } from "@/lib/firebase/auth";
 
 const EASE = "700ms cubic-bezier(0.4, 0, 0.2, 1)";
-const STAFF_ROLES = ["admin"];
+// Keep in sync with STAFF_ROLES in lib/models/User.ts.
+const STAFF_ROLES = ["admin", "exec"];
 
 const NAV_LINKS = [
   { href: "/", label: "Home" },

@@ -20,6 +20,7 @@ export default function UsersTable({ rows: initialRows, meUid, canEdit }: { rows
   const [filter, setFilter] = useState<"all" | "staff">("all");
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState<{ uid: string; name: string; role: string; label: string } | null>(null);
 
   const counts = useMemo(() => {
     const admins = rows.filter((r) => r.role === "admin").length;
@@ -91,7 +92,7 @@ export default function UsersTable({ rows: initialRows, meUid, canEdit }: { rows
                     return (
                       <button
                         key={opt.value}
-                        onClick={() => !active && !selfDemote && changeRole(r.uid, opt.value)}
+                        onClick={() => !active && !selfDemote && setPending({ uid: r.uid, name: r.name, role: opt.value, label: opt.label })}
                         disabled={busy === r.uid || active || selfDemote}
                         title={selfDemote ? "You can't remove your own admin access" : undefined}
                         className="rounded-full px-3 py-1.5 text-[12px] font-semibold transition-colors disabled:cursor-default"
@@ -113,6 +114,26 @@ export default function UsersTable({ rows: initialRows, meUid, canEdit }: { rows
           );
         })}
       </div>
+
+      {pending && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6" style={{ background: "rgba(0,0,0,0.6)" }} onClick={() => setPending(null)}>
+          <div className="card w-full max-w-sm p-7" onClick={(e) => e.stopPropagation()}>
+            <p className="t-eyebrow">Change role</p>
+            <p className="t-body mt-3">
+              Set <span className="font-semibold text-white">{pending.name}</span> as <span className="font-semibold text-white">{pending.label}</span>?
+            </p>
+            <div className="mt-6 flex justify-end gap-2">
+              <button onClick={() => setPending(null)} className="pill pill-ghost !px-4 !py-2 !text-[13px]">Cancel</button>
+              <button
+                onClick={() => { const p = pending; setPending(null); changeRole(p.uid, p.role); }}
+                className="pill pill-blue !px-4 !py-2 !text-[13px]"
+              >
+                Set as {pending.label}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
