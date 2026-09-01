@@ -3,7 +3,8 @@ import type { NextRequest } from "next/server";
 
 // UX-only redirects. The real security is the server-side guards in
 // lib/auth/guard.ts — the user_role cookie is client-visible and not trusted.
-const STAFF_ROLES = ["admin"];
+// Keep in sync with STAFF_ROLES in lib/models/User.ts.
+const STAFF_ROLES = ["admin", "exec"];
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;

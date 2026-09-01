@@ -1,4 +1,4 @@
-import { requireAdmin } from "@/lib/auth/guard";
+import { requireStaff } from "@/lib/auth/guard";
 import { getAllApplications } from "@/lib/firebase/applications";
 import { getInterviewSignupLink } from "@/lib/firebase/config";
 import { getScores } from "@/lib/firebase/scores";
@@ -8,7 +8,7 @@ import { TEAMS } from "@/lib/models/User";
 import ReviewBoard, { type ReviewItem, type Track } from "@/components/ReviewBoard";
 
 export default async function AdminInterviews() {
-  const { uid } = await requireAdmin();
+  const { uid } = await requireStaff();
   const [apps, interviewScores, reviewScores, signupLink] = await Promise.all([getAllApplications(), getScores("interview"), getScores("review"), getInterviewSignupLink()]);
   const submitted = apps.filter((a) => a.status === ApplicationStatus.SUBMITTED);
 

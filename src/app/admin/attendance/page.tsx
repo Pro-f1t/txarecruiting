@@ -1,5 +1,5 @@
 import QRCode from "qrcode";
-import { requireAdmin } from "@/lib/auth/guard";
+import { requireStaff } from "@/lib/auth/guard";
 import { getAllUsers } from "@/lib/firebase/users";
 import { getBaseUrl } from "@/lib/utils/baseUrl";
 import { EVENTS, EVENT_TYPE_LABEL, SEASON } from "@/data/events";
@@ -9,11 +9,11 @@ import AttendanceManager, { type AttEvent, type AttUser } from "@/components/Att
 const TYPE_BADGE: Record<string, string> = { info_session: "badge-ok", coffee_chat: "badge-warn" };
 
 export default async function AdminAttendance() {
-  await requireAdmin();
+  await requireStaff();
 
   const [users, base] = await Promise.all([getAllUsers(), getBaseUrl()]);
-  // Applicants only for the roster / requirement stats (execs don't "attend").
-  const applicants = users.filter((u) => u.role !== UserRole.ADMIN);
+  // Applicants only for the roster / requirement stats (staff don't "attend").
+  const applicants = users.filter((u) => u.role === UserRole.APPLICANT);
   const events = EVENTS.filter((e) => e.type !== "deadline");
 
   const countFor = (id: string) => applicants.filter((u) => (u.attendedEventIds ?? []).includes(id)).length;

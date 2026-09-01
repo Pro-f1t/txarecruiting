@@ -1,10 +1,15 @@
 import Link from "next/link";
+import { requireStaff } from "@/lib/auth/guard";
 import { getAllApplications } from "@/lib/firebase/applications";
 import { getRecruitingStep, getInterviewSignupLink } from "@/lib/firebase/config";
 import { ApplicationStatus } from "@/lib/models/Application";
+import { STEP_LABELS } from "@/lib/models/Config";
+import { UserRole } from "@/lib/models/User";
 import StepControl from "@/components/StepControl";
 
 export default async function AdminOverview() {
+  const { user } = await requireStaff();
+  const isAdmin = user.role === UserRole.ADMIN;
   const [apps, step, interviewLink] = await Promise.all([getAllApplications(), getRecruitingStep(), getInterviewSignupLink()]);
 
   const submitted = apps.filter((a) => a.status === ApplicationStatus.SUBMITTED);
@@ -48,7 +53,17 @@ export default async function AdminOverview() {
         ))}
       </div>
 
-      <StepControl current={step} readiness={readiness} />
+      {isAdmin ? (
+        <StepControl current={step} readiness={readiness} />
+      ) : (
+        <div className="card flex items-center justify-between gap-4 p-7">
+          <div>
+            <p className="t-eyebrow">Recruiting step</p>
+            <p className="t-body mt-1 text-muted">Only admins can change the recruiting step.</p>
+          </div>
+          <span className="badge badge-ok">{STEP_LABELS[step]}</span>
+        </div>
+      )}
 
       <div className="card flex items-center justify-between gap-4 p-7">
         <div>

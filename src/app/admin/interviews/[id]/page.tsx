@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { requireAdmin } from "@/lib/auth/guard";
+import { requireStaff } from "@/lib/auth/guard";
 import { getApplication } from "@/lib/firebase/applications";
 import { getUser } from "@/lib/firebase/users";
 import { getScoresForAppTrack } from "@/lib/firebase/scores";
@@ -13,7 +13,7 @@ export default async function InterviewDetail({
   params: Promise<{ id: string }>;
   searchParams: Promise<{ track?: string }>;
 }) {
-  const { uid } = await requireAdmin();
+  const { uid } = await requireStaff();
   const { id } = await params;
   const { track: rawTrack } = await searchParams;
 

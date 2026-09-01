@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { requireStaff } from "@/lib/auth/guard";
 import { getApplication } from "@/lib/firebase/applications";
 import { getUser } from "@/lib/firebase/users";
 import { getRecruitingStep } from "@/lib/firebase/config";
+import { UserRole } from "@/lib/models/User";
 import { STEP_LABELS } from "@/lib/models/Config";
 import { adminStatus, ADMIN_STATUS_LABEL, ADMIN_STATUS_BADGE } from "@/lib/utils/adminStatus";
 import ApplicationAnswers from "@/components/ApplicationAnswers";
@@ -10,6 +12,8 @@ import DeleteApplicationButton from "@/components/DeleteApplicationButton";
 
 export default async function AdminApplicationDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const { user } = await requireStaff();
+  const isAdmin = user.role === UserRole.ADMIN;
   const [app, step] = await Promise.all([getApplication(id), getRecruitingStep()]);
   if (!app) notFound();
   const applicant = await getUser(app.userId);
@@ -29,7 +33,7 @@ export default async function AdminApplicationDetail({ params }: { params: Promi
         <div className="flex flex-shrink-0 flex-col items-end gap-2">
           <span className={`badge ${isDraft ? "badge-warn" : ADMIN_STATUS_BADGE[status]}`}>{isDraft ? "Draft" : ADMIN_STATUS_LABEL[status]}</span>
           <span className="text-[12px] text-muted">Recruiting step: {STEP_LABELS[step]}</span>
-          <DeleteApplicationButton appId={app.id} name={app.userName ?? "this applicant"} />
+          {isAdmin && <DeleteApplicationButton appId={app.id} name={app.userName ?? "this applicant"} />}
         </div>
       </div>
 

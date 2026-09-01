@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireAdmin, guardErrorStatus } from "@/lib/auth/guard";
+import { requireStaff, guardErrorStatus } from "@/lib/auth/guard";
 import { getAllApplications } from "@/lib/firebase/applications";
 import { getAllUsers } from "@/lib/firebase/users";
 import { ApplicationStatus } from "@/lib/models/Application";
@@ -35,7 +35,7 @@ const COLUMNS = [
 
 export async function GET() {
   try {
-    await requireAdmin();
+    await requireStaff();
 
     const [apps, users] = await Promise.all([getAllApplications(), getAllUsers()]);
     const attendance = new Map(users.map((u) => [u.uid, u.attendedEventIds ?? []]));

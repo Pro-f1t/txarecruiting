@@ -1,8 +1,10 @@
-// Only two user roles. Admins run the whole console and do all reviewing;
-// applicants apply. (The member/lead distinction lives on the APPLICATION, not
-// here — see ApplicantRole.)
+// User roles. ADMIN runs the whole console. EXEC is a reduced-access reviewer:
+// can grade interviews, but cannot touch the recruiting step, grade
+// applications, or manage roles. APPLICANT applies. (The member/lead
+// distinction lives on the APPLICATION, not here — see ApplicantRole.)
 export enum UserRole {
   ADMIN = "admin",
+  EXEC = "exec",
   APPLICANT = "applicant",
 }
 
@@ -20,8 +22,13 @@ export enum Team {
 
 export const TEAMS: Team[] = Object.values(Team);
 
-// "Staff" = everyone who can see the admin console. Only admins.
-export const STAFF_ROLES: UserRole[] = [UserRole.ADMIN];
+// "Staff" = everyone who can see the admin console: admins and execs.
+export const STAFF_ROLES: UserRole[] = [UserRole.ADMIN, UserRole.EXEC];
+
+// Display order (roster sorting) and labels.
+export const ROLE_ORDER: UserRole[] = [UserRole.ADMIN, UserRole.EXEC, UserRole.APPLICANT];
+export const ROLE_RANK: Record<UserRole, number> = { [UserRole.ADMIN]: 0, [UserRole.EXEC]: 1, [UserRole.APPLICANT]: 2 };
+export const ROLE_LABEL: Record<UserRole, string> = { [UserRole.ADMIN]: "Admin", [UserRole.EXEC]: "Exec", [UserRole.APPLICANT]: "Applicant" };
 
 export interface User {
   uid: string;

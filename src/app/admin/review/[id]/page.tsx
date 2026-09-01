@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { requireAdmin } from "@/lib/auth/guard";
+import { notFound, redirect } from "next/navigation";
+import { requireAdmin, guardErrorStatus } from "@/lib/auth/guard";
 import { getApplication } from "@/lib/firebase/applications";
 import { getUser } from "@/lib/firebase/users";
 import { getScoresForAppTrack } from "@/lib/firebase/scores";
@@ -13,7 +13,12 @@ export default async function ReviewDetail({
   params: Promise<{ id: string }>;
   searchParams: Promise<{ track?: string }>;
 }) {
-  const { uid } = await requireAdmin();
+  let uid: string;
+  try {
+    ({ uid } = await requireAdmin());
+  } catch (e) {
+    redirect(guardErrorStatus(e) === 403 ? "/admin" : "/auth/login");
+  }
   const { id } = await params;
   const { track: rawTrack } = await searchParams;
 

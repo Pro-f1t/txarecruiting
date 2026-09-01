@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAdmin, guardErrorStatus } from "@/lib/auth/guard";
+import { requireStaff, guardErrorStatus } from "@/lib/auth/guard";
+import { UserRole } from "@/lib/models/User";
 import { getApplication } from "@/lib/firebase/applications";
 import { upsertScore, clearScore } from "@/lib/firebase/scores";
 import { recordAudit } from "@/lib/firebase/audit";
@@ -7,12 +8,16 @@ import { recordAudit } from "@/lib/firebase/audit";
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   try {
-    const { uid, user } = await requireAdmin();
+    const { uid, user } = await requireStaff();
 
     let body: { track?: string; stage?: string; score?: number; comment?: string; clear?: boolean };
     try { body = await request.json(); } catch { return NextResponse.json({ error: "Invalid body." }, { status: 400 }); }
 
     const stage = body.stage === "interview" ? "interview" : "review";
+    // Execs may grade interviews but not applications.
+    if (stage === "review" && user.role !== UserRole.ADMIN) {
+      return NextResponse.json({ error: "Only admins can grade applications." }, { status: 403 });
+    }
     if (typeof body.track !== "string" || !body.track) return NextResponse.json({ error: "Missing track." }, { status: 400 });
 
     const app = await getApplication(id);

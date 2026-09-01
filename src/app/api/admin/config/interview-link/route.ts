@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
-import { requireAdmin, guardErrorStatus } from "@/lib/auth/guard";
+import { requireStaff, guardErrorStatus } from "@/lib/auth/guard";
 import { getInterviewSignupLink, setInterviewSignupLink } from "@/lib/firebase/config";
 import { recordAudit } from "@/lib/firebase/audit";
 
 export async function GET() {
   try {
-    await requireAdmin();
+    await requireStaff();
     return NextResponse.json({ link: await getInterviewSignupLink() });
   } catch (error) {
     return NextResponse.json({ error: "Unauthorized" }, { status: guardErrorStatus(error) ?? 500 });
@@ -14,7 +14,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const { uid, user } = await requireAdmin();
+    const { uid, user } = await requireStaff();
     let body: { link?: string };
     try { body = await request.json(); } catch { return NextResponse.json({ error: "Invalid body." }, { status: 400 }); }
     const link = typeof body.link === "string" ? body.link.trim() : "";

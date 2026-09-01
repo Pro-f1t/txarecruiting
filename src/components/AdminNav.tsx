@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 const LINKS = [
   { href: "/admin", label: "Overview", exact: true },
   { href: "/admin/applications", label: "Applications" },
-  { href: "/admin/review", label: "Application review" },
+  { href: "/admin/review", label: "Application review", adminOnly: true },
   { href: "/admin/interviews", label: "Interview review" },
   { href: "/admin/attendance", label: "Attendance" },
   { href: "/admin/stats", label: "Stats" },
@@ -14,12 +14,13 @@ const LINKS = [
   { href: "/admin/activity", label: "Activity" },
 ];
 
-export default function AdminNav() {
+export default function AdminNav({ isAdmin }: { isAdmin: boolean }) {
   const pathname = usePathname();
   const isActive = (l: { href: string; exact?: boolean }) => (l.exact ? pathname === l.href : pathname.startsWith(l.href));
+  const links = LINKS.filter((l) => isAdmin || !l.adminOnly);
   return (
     <nav className="flex flex-wrap gap-1 border-b border-white/10 pb-1">
-      {LINKS.map((l) => (
+      {links.map((l) => (
         <Link
           key={l.href}
           href={l.href}

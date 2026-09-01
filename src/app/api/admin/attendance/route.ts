@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireAdmin, guardErrorStatus } from "@/lib/auth/guard";
+import { requireStaff, guardErrorStatus } from "@/lib/auth/guard";
 import { addAttendance, removeAttendance } from "@/lib/firebase/attendance";
 import { recordAudit } from "@/lib/firebase/audit";
 import { EVENTS } from "@/data/events";
@@ -8,7 +8,7 @@ const VALID_EVENT_IDS = new Set(EVENTS.filter((e) => e.type !== "deadline").map(
 
 export async function POST(request: Request) {
   try {
-    const { uid: actorUid, user: actor } = await requireAdmin();
+    const { uid: actorUid, user: actor } = await requireStaff();
 
     let body: { uid?: string; eventId?: string; present?: boolean };
     try { body = await request.json(); } catch { return NextResponse.json({ error: "Invalid body." }, { status: 400 }); }

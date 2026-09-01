@@ -1,4 +1,5 @@
-import { requireAdmin } from "@/lib/auth/guard";
+import { redirect } from "next/navigation";
+import { requireAdmin, guardErrorStatus } from "@/lib/auth/guard";
 import { getAllApplications } from "@/lib/firebase/applications";
 import { getScores } from "@/lib/firebase/scores";
 import { ApplicationStatus } from "@/lib/models/Application";
@@ -6,7 +7,12 @@ import { TEAMS } from "@/lib/models/User";
 import ReviewBoard, { type ReviewItem, type Track } from "@/components/ReviewBoard";
 
 export default async function AdminReview() {
-  const { uid } = await requireAdmin();
+  let uid: string;
+  try {
+    ({ uid } = await requireAdmin());
+  } catch (e) {
+    redirect(guardErrorStatus(e) === 403 ? "/admin" : "/auth/login");
+  }
   const [apps, scores] = await Promise.all([getAllApplications(), getScores("review")]);
   const submitted = apps.filter((a) => a.status === ApplicationStatus.SUBMITTED);
 

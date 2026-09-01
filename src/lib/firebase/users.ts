@@ -18,6 +18,10 @@ export function toUser(data: any): User {
   };
 }
 
+export async function setUserRole(uid: string, role: UserRole): Promise<void> {
+  await adminDb.collection(USERS).doc(uid).update({ role });
+}
+
 export async function getUser(uid: string): Promise<User | null> {
   const doc = await adminDb.collection(USERS).doc(uid).get();
   if (!doc.exists) return null;

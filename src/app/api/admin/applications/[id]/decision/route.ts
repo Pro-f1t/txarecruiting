@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAdmin, guardErrorStatus } from "@/lib/auth/guard";
+import { requireStaff, guardErrorStatus } from "@/lib/auth/guard";
+import { UserRole } from "@/lib/models/User";
 import { getApplication, setDecision } from "@/lib/firebase/applications";
 import { recordAudit } from "@/lib/firebase/audit";
 import { StageDecision } from "@/lib/models/Application";
@@ -10,13 +11,17 @@ const DECISIONS: StageDecision[] = ["advanced", "rejected", "pending"];
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   try {
-    const { uid, user } = await requireAdmin();
+    const { uid, user } = await requireStaff();
 
     let body: { key?: string; stage?: string; decision?: string };
     try { body = await request.json(); } catch { return NextResponse.json({ error: "Invalid body." }, { status: 400 }); }
 
     const { key, stage, decision } = body;
     if (!STAGES.includes(stage as (typeof STAGES)[number])) return NextResponse.json({ error: "Bad stage." }, { status: 400 });
+    // Application-review decisions are admin-only; execs act only at the interview (final) stage.
+    if (stage === "review" && user.role !== UserRole.ADMIN) {
+      return NextResponse.json({ error: "Only admins can decide applications." }, { status: 403 });
+    }
     if (!DECISIONS.includes(decision as StageDecision)) return NextResponse.json({ error: "Bad decision." }, { status: 400 });
     if (typeof key !== "string" || !key) return NextResponse.json({ error: "Missing key." }, { status: 400 });
 
