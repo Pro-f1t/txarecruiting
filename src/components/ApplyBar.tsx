@@ -8,7 +8,7 @@ export default function ApplyBar() {
         <div>
           <h2 className="t-card-title">Applications are open.</h2>
           <p className="t-body mt-2 text-muted-ink">
-            Sign in with your UT Google account, check in at your events, and apply.
+            Sign in with your Google account, check in at your events, and apply.
           </p>
         </div>
         <Link href="/apply" className="pill pill-dark shrink-0">

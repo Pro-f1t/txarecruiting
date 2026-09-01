@@ -3,9 +3,7 @@ import { adminAuth } from "@/lib/firebase/admin";
 import { getUser, createUser } from "@/lib/firebase/users";
 import { User, UserRole } from "@/lib/models/User";
 
-// Only @utexas.edu UTMail accounts may sign in (plus a small staff allowlist).
-const ALLOWED_DOMAINS = ["utexas.edu"];
-const ALLOWED_EMAILS: string[] = [];
+// Any Google account may sign in.
 
 export async function POST(request: Request) {
   let idToken: string | undefined;
@@ -25,20 +23,6 @@ export async function POST(request: Request) {
     const decoded = await adminAuth.verifySessionCookie(sessionCookie, true);
     const record = await adminAuth.getUser(decoded.uid);
     const existing = await getUser(decoded.uid);
-
-    const email = (record.email || "").toLowerCase();
-    const domain = email.includes("@") ? email.split("@")[1] : "";
-    if (!ALLOWED_DOMAINS.includes(domain) && !ALLOWED_EMAILS.includes(email)) {
-      // The Google popup created the auth record client-side before this check;
-      // delete it for brand-new rejects so Auth doesn't accumulate dead accounts.
-      if (!existing) {
-        try { await adminAuth.deleteUser(decoded.uid); } catch {}
-      }
-      return NextResponse.json(
-        { error: "You must sign in with your UTMail @utexas.edu address. Set one up at https://get.utmail.utexas.edu/" },
-        { status: 400 }
-      );
-    }
 
     let role = UserRole.APPLICANT;
     if (existing) {

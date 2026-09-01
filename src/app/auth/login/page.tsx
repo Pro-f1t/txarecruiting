@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { signInWithGoogle, signOutClient } from "@/lib/firebase/auth";
 
@@ -14,7 +14,6 @@ function isInAppBrowser(): boolean {
 }
 
 function LoginForm() {
-  const router = useRouter();
   const params = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -44,7 +43,10 @@ function LoginForm() {
       }
       const staff = ["admin"].includes(body.role);
       const next = params.get("next");
-      router.push(next || (staff ? "/admin" : "/dashboard"));
+      // Hard navigation (not router.push) so the just-set session cookie is sent
+      // with the request — a client nav can race the cookie and bounce a brand-new
+      // user back to sign-in until they refresh.
+      window.location.assign(next || (staff ? "/admin" : "/dashboard"));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Sign-in failed.");
     } finally {
@@ -90,8 +92,7 @@ function LoginForm() {
         )}
 
         <p className="mt-6 text-[13px] text-muted">
-          Sign in with your UT Google account (@utexas.edu). New applicants are registered
-          automatically.
+          Sign in with your Google account. New applicants are registered automatically.
         </p>
       </div>
     </section>

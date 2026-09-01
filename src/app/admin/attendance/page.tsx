@@ -37,7 +37,7 @@ export default async function AdminAttendance() {
         <div>
           <h1 className="t-card-title">Attendance</h1>
           <p className="t-body mt-2 text-muted">
-            Display a QR code at each event — applicants scan, sign in with UT Google, and are checked in automatically.
+            Display a QR code at each event — applicants scan, sign in with Google, and are checked in automatically.
           </p>
         </div>
         <div className="text-right">
