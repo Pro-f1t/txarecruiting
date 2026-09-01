@@ -9,7 +9,16 @@ import "dotenv/config";
 import admin from "firebase-admin";
 
 const DRY = process.env.DRY_RUN === "1";
-const usingEmulator = !!process.env.FIRESTORE_EMULATOR_HOST;
+// Passing a service-account key targets production. The Admin SDK honours
+// FIRESTORE_EMULATOR_HOST even with real credentials, and dotenv loads it from
+// .env — so strip it (and the auth host) to actually reach production.
+const forceProd = !!process.env.GOOGLE_APPLICATION_CREDENTIALS && process.env.USE_EMULATOR !== "1";
+if (forceProd) {
+  delete process.env.FIRESTORE_EMULATOR_HOST;
+  delete process.env.FIREBASE_AUTH_EMULATOR_HOST;
+  delete process.env.FIREBASE_STORAGE_EMULATOR_HOST;
+}
+const usingEmulator = !forceProd && !!process.env.FIRESTORE_EMULATOR_HOST;
 
 if (!admin.apps.length) {
   if (usingEmulator) {
