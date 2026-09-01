@@ -1,10 +1,10 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { signInWithGoogle, signOutClient } from "@/lib/firebase/auth";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const params = useSearchParams();
   const [loading, setLoading] = useState(false);
@@ -66,5 +66,23 @@ export default function LoginPage() {
         </p>
       </div>
     </section>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <section className="shell flex min-h-svh items-center justify-center py-20">
+          <div className="card w-full max-w-md p-8">
+            <p className="t-eyebrow">Texas Accelerate</p>
+            <h1 className="t-card-title mt-3">Sign in</h1>
+            <p className="t-body mt-2 text-muted">Loading…</p>
+          </div>
+        </section>
+      }
+    >
+      <LoginForm />
+    </Suspense>
   );
 }
