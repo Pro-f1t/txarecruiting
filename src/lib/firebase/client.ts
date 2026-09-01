@@ -13,9 +13,16 @@ const useEmulator = process.env.NEXT_PUBLIC_FIREBASE_EMULATOR === "1";
 // (Firebase console → Project settings → Your apps → Web app config) before
 // deploying to production. In emulator mode the projectId is overridden below,
 // so the placeholders are fine for all local development.
+// Serve Firebase Auth from our OWN origin (proxied — see next.config.ts) so the
+// login handler is first-party and Safari/iPad storage partitioning can't break
+// it. On the client that's the current host; the string fallback only applies
+// during SSR, where no auth call runs.
+const authDomain =
+  typeof window !== "undefined" ? window.location.host : "txarecruiting.vercel.app";
+
 export const firebaseConfig = {
   apiKey: "AIzaSyAbWsz1WepeH9hNBxq2lrYUjfWx-a3GKbg",
-  authDomain: "txarecruiting.firebaseapp.com",
+  authDomain,
   // Auth tokens carry the project id and the server verifies it, so the browser
   // must use the emulator project when the server does.
   projectId: useEmulator ? EMULATOR_PROJECT_ID : "txarecruiting",
