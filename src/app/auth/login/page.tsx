@@ -1,8 +1,9 @@
 "use client";
 
+import type { UserCredential } from "firebase/auth";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
-import { signInWithGoogle, signOutClient } from "@/lib/firebase/auth";
+import { Suspense, useCallback, useEffect, useState } from "react";
+import { signInWithGoogle, completeRedirectSignIn, signOutClient } from "@/lib/firebase/auth";
 
 function LoginForm() {
   const router = useRouter();
@@ -10,11 +11,9 @@ function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleLogin = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const cred = await signInWithGoogle();
+  // Exchange a Google credential for a server session cookie, then route on.
+  const establishSession = useCallback(
+    async (cred: UserCredential) => {
       const idToken = await cred.user.getIdToken();
       const res = await fetch("/api/auth/session", {
         method: "POST",
@@ -30,9 +29,39 @@ function LoginForm() {
       const staff = ["admin"].includes(body.role);
       const next = params.get("next");
       router.push(next || (staff ? "/admin" : "/dashboard"));
+    },
+    [params, router]
+  );
+
+  // On load, complete any pending mobile redirect sign-in.
+  useEffect(() => {
+    let active = true;
+    completeRedirectSignIn()
+      .then((cred) => {
+        if (!active || !cred) return;
+        setLoading(true); // returning from a mobile redirect — finish the sign-in
+        establishSession(cred);
+      })
+      .catch((e) => {
+        if (!active) return;
+        setError(e instanceof Error ? e.message : "Sign-in failed.");
+      });
+    return () => {
+      active = false;
+    };
+  }, [establishSession]);
+
+  const handleLogin = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const cred = await signInWithGoogle();
+      if (cred) {
+        await establishSession(cred); // popup path
+      }
+      // redirect path (cred === null): the browser navigates away; leave loading on
     } catch (e) {
       setError(e instanceof Error ? e.message : "Sign-in failed.");
-    } finally {
       setLoading(false);
     }
   };
