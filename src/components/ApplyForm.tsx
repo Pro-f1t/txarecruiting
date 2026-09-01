@@ -259,7 +259,7 @@ export default function ApplyForm({
             <p className="t-body text-muted">Select the field team(s) you want to lead above to answer the skills question for each.</p>
           ) : (
             leadTeams.map((t) => (
-              <Long key={t} label={`Describe relevant skills/prior experience you have for ${teamTitle(t)}.`} value={skills[t] ?? ""} onChange={(v) => setSk(t, v)} required max={100} count={wordCount(skills[t] ?? "")} />
+              <Long key={t} label={`Describe relevant skills/prior experience you have for ${teamTitle(t)}. (100–150 words)`} value={skills[t] ?? ""} onChange={(v) => setSk(t, v)} required max={150} count={wordCount(skills[t] ?? "")} />
             ))
           )}
           <label className="block">
