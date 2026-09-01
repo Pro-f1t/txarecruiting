@@ -73,8 +73,13 @@ export default function ApplyForm({
       const url = await uploadFile(folder, uid, file);
       set(key, url);
       setName(file.name);
-    } catch {
-      setError("Upload failed. Please try again.");
+    } catch (e) {
+      const code = e && typeof e === "object" && "code" in e ? String((e as { code?: string }).code) : "";
+      let msg = e instanceof Error ? e.message : "Upload failed. Please try again.";
+      if (code === "storage/unauthorized") msg = "Upload was blocked by permissions. Make sure you're signed in, then try again.";
+      else if (code === "storage/retry-limit-exceeded" || code === "storage/canceled") msg = "Upload didn't finish — check your connection and try again.";
+      else if (code && code !== "storage/unauthenticated") msg = `Upload failed (${code}). Please try again.`;
+      setError(msg);
     } finally {
       setUploading(false);
     }
