@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { requireStaff } from "@/lib/auth/guard";
 import { getApplication } from "@/lib/firebase/applications";
 import { getUser } from "@/lib/firebase/users";
+import { getConversationsForApplicant } from "@/lib/firebase/conversations";
 import { getRecruitingStep } from "@/lib/firebase/config";
 import { UserRole } from "@/lib/models/User";
 import { STEP_LABELS } from "@/lib/models/Config";
@@ -17,6 +18,7 @@ export default async function AdminApplicationDetail({ params }: { params: Promi
   const [app, step] = await Promise.all([getApplication(id), getRecruitingStep()]);
   if (!app) notFound();
   const applicant = await getUser(app.userId);
+  const conversations = await getConversationsForApplicant(app?.userId ?? id);
 
   const status = adminStatus(app);
   const isDraft = app.status === "in_progress";
@@ -45,7 +47,7 @@ export default async function AdminApplicationDetail({ params }: { params: Promi
       <p className="t-body mt-4 text-muted">Read-only preview. To score or decide, use Review.</p>
 
       <div className="mt-6">
-        <ApplicationAnswers app={app} attendedEventIds={applicant?.attendedEventIds ?? []} />
+        <ApplicationAnswers app={app} attendedEventIds={applicant?.attendedEventIds ?? []} conversations={conversations} />
       </div>
     </div>
   );

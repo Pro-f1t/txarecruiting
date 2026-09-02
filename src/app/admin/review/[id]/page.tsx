@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { requireAdmin, guardErrorStatus } from "@/lib/auth/guard";
 import { getApplication } from "@/lib/firebase/applications";
 import { getUser } from "@/lib/firebase/users";
+import { getConversationsForApplicant } from "@/lib/firebase/conversations";
 import { getScoresForAppTrack } from "@/lib/firebase/scores";
 import ApplicationAnswers from "@/components/ApplicationAnswers";
 import ReviewScorePanel from "@/components/ReviewScorePanel";
@@ -24,6 +25,7 @@ export default async function ReviewDetail({
 
   const app = await getApplication(id);
   const applicant = await getUser(app?.userId ?? id);
+  const conversations = await getConversationsForApplicant(app?.userId ?? id);
   if (!app) notFound();
 
   const validTracks = [...(app.memberTeams.length > 0 ? ["member"] : []), ...app.leadTeams.map((t) => `lead:${t}`)];
@@ -47,7 +49,7 @@ export default async function ReviewDetail({
       </div>
 
       <div className="mt-6 grid gap-8 lg:grid-cols-[1.3fr_1fr] lg:items-start">
-        <ApplicationAnswers app={app} attendedEventIds={applicant?.attendedEventIds ?? []} />
+        <ApplicationAnswers app={app} attendedEventIds={applicant?.attendedEventIds ?? []} conversations={conversations} />
         <div className="lg:sticky lg:top-24">
           <ReviewScorePanel appId={id} track={track} myScore={mine?.score ?? null} myComment={mine?.comment ?? ""} others={others} avg={avg} />
         </div>

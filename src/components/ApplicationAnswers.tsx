@@ -1,4 +1,5 @@
 import { Application } from "@/lib/models/Application";
+import type { Conversation } from "@/lib/firebase/conversations";
 import { EVENTS, EVENT_TYPE_LABEL } from "@/data/events";
 
 const TYPE_BADGE: Record<string, string> = { info_session: "badge-ok", coffee_chat: "badge-warn", deadline: "badge-danger" };
@@ -23,7 +24,7 @@ function FileLink({ label, url }: { label: string; url?: string }) {
 }
 
 /** Read-only view of an application's answers + an embedded resume viewer. */
-export default function ApplicationAnswers({ app, attendedEventIds = [] }: { app: Application; attendedEventIds?: string[] }) {
+export default function ApplicationAnswers({ app, attendedEventIds = [], conversations = [] }: { app: Application; attendedEventIds?: string[]; conversations?: Conversation[] }) {
   const fd = app.formData;
   const major = [fd.major, fd.major2].filter(Boolean).join(" & ");
   const fullName = [fd.firstName, fd.lastName].filter(Boolean).join(" ");
@@ -56,6 +57,25 @@ export default function ApplicationAnswers({ app, attendedEventIds = [] }: { app
           </div>
         ) : (
           <p className="t-body mt-4 text-muted">No events checked in yet.</p>
+        )}
+      </div>
+
+      <div className="card p-7">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="t-eyebrow">Conversations</p>
+          {conversations.length > 0 && <span className="badge badge-ok">Talked to by {conversations.length}</span>}
+        </div>
+        {conversations.length > 0 ? (
+          <div className="mt-4 space-y-2">
+            {conversations.map((c) => (
+              <div key={c.staffUid} className="rounded-2xl p-3.5" style={{ background: "var(--color-surface-2)" }}>
+                <p className="text-[14px] font-medium">{c.staffName ?? "An exec"}</p>
+                {c.comment && <p className="mt-1 whitespace-pre-wrap text-[13px] text-muted">{c.comment}</p>}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="t-body mt-4 text-muted">No one has logged a conversation with this applicant yet.</p>
         )}
       </div>
 
