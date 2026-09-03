@@ -33,7 +33,7 @@ export default async function AdminInterviews() {
       const k = `${a.id}::${track}`;
       const agg = iv.get(k);
       return {
-        appId: a.id, name: a.userName ?? "Unknown", email: a.userEmail ?? "",
+        appId: a.id, name: a.userName ?? "Unknown", email: a.userEmail ?? "", teams: a.memberTeams,
         avg: avgOf(iv, k), priorAvg: avgOf(rv, k), count: agg?.count ?? 0, myScore: agg?.mine ?? null,
         decision: a.finalDecisions?.[track],
       };

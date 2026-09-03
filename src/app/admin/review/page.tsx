@@ -32,7 +32,7 @@ export default async function AdminReview() {
     [...appsInTrack].sort(inOrder).map((a) => {
       const agg = byKey.get(`${a.id}::${track}`);
       return {
-        appId: a.id, name: a.userName ?? "Unknown", email: a.userEmail ?? "",
+        appId: a.id, name: a.userName ?? "Unknown", email: a.userEmail ?? "", teams: a.memberTeams,
         avg: agg && agg.count > 0 ? agg.sum / agg.count : null,
         count: agg?.count ?? 0, myScore: agg?.mine ?? null,
         decision: a.reviewDecisions?.[track],

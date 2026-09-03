@@ -11,6 +11,8 @@ export default async function AdminApplications() {
     userName: a.userName ?? "Unknown",
     userEmail: a.userEmail ?? "",
     hasMember: a.memberTeams.length > 0,
+    memberTeams: a.memberTeams,
+    leadTeams: a.leadTeams,
     hasLead: a.leadTeams.length > 0,
     leadCount: a.leadTeams.length,
     rowStatus: a.status === ApplicationStatus.IN_PROGRESS ? "draft" : adminStatus(a),

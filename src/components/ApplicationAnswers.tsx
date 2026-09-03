@@ -83,6 +83,8 @@ export default function ApplicationAnswers({ app, attendedEventIds = [], convers
         <p className="t-eyebrow">Application</p>
         <div className="mt-5 grid gap-5 sm:grid-cols-2">
           <QA label="Name" value={fullName || undefined} />
+          <QA label="Field team interests (member)" value={app.memberTeams.length > 0 ? app.memberTeams.join(", ") : undefined} />
+          {app.leadTeams.length > 0 && <QA label="Applying to lead" value={app.leadTeams.join(", ")} />}
           <QA label="Major" value={major || undefined} />
           <QA label="Graduation year" value={fd.graduationYear} />
           <QA label="Phone" value={fd.phone} />

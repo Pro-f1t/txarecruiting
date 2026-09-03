@@ -11,6 +11,8 @@ export type Row = {
   hasMember: boolean;
   hasLead: boolean;
   leadCount: number;
+  memberTeams: string[];
+  leadTeams: string[];
   rowStatus: AdminStatus | "draft";
 };
 
@@ -76,6 +78,12 @@ export default function ApplicationsTable({ rows }: { rows: Row[] }) {
               <div className="min-w-0">
                 <p className="truncate text-[15px] font-semibold">{r.userName}</p>
                 <p className="truncate text-[12px] text-muted">{r.userEmail}</p>
+                {r.memberTeams.length > 0 && (
+                  <p className="mt-1 truncate text-[12px]"><span className="text-muted">Interested in: </span>{r.memberTeams.join(", ")}</p>
+                )}
+                {r.leadTeams.length > 0 && (
+                  <p className="truncate text-[12px]"><span className="text-muted">Lead: </span>{r.leadTeams.join(", ")}</p>
+                )}
               </div>
               <div className="flex flex-wrap items-center gap-2 text-[12px]">
                 {r.hasMember && <span className="badge badge-muted">Member</span>}

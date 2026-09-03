@@ -48,7 +48,12 @@ export default async function InterviewDetail({
       <div className="mt-4">
         <h1 className="t-card-title">{app.userName}</h1>
         <p className="text-[13px] text-muted">{app.userEmail}</p>
-        <span className="badge badge-warn mt-2 inline-block">Interview · {trackLabel}</span>
+        <div className="mt-2 flex flex-wrap items-center gap-2">
+          <span className="badge badge-warn">Interview · {trackLabel}</span>
+          {track === "member" && app.memberTeams.length > 0 && (
+            <span className="text-[13px] text-muted">Interested in: <span className="text-white">{app.memberTeams.join(", ")}</span></span>
+          )}
+        </div>
       </div>
 
       <div className="mt-6 grid gap-8 lg:grid-cols-[1.3fr_1fr] lg:items-start">

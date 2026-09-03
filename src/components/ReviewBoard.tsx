@@ -13,6 +13,7 @@ export type ReviewItem = {
   myScore: number | null;
   decision?: "advanced" | "rejected" | "pending";
   priorAvg?: number | null; // application-review aggregate (shown in interview review)
+  teams?: string[]; // member field-team interests
 };
 export type Track = { key: string; label: string };
 
@@ -117,6 +118,9 @@ export default function ReviewBoard({
             <Link href={`${detailBase}/${it.appId}?track=${encodeURIComponent(track)}`} className="min-w-[160px] flex-1 group">
               <p className="text-[15px] font-semibold group-hover:text-accent">{it.name}</p>
               <p className="truncate text-[12px] text-muted">{it.email}</p>
+              {it.teams && it.teams.length > 0 && (
+                <p className="mt-0.5 truncate text-[12px]"><span className="text-muted">Interested in: </span>{it.teams.join(", ")}</p>
+              )}
             </Link>
 
             {it.myScore == null
