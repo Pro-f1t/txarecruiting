@@ -1,8 +1,9 @@
 "use client";
 
+import type { UserCredential } from "firebase/auth";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
-import { signInWithGoogle, signOutClient } from "@/lib/firebase/auth";
+import { Suspense, useCallback, useEffect, useState } from "react";
+import { signInWithGoogle, completeRedirectSignIn, signOutClient } from "@/lib/firebase/auth";
 
 // In-app browsers (Instagram, TikTok, Snapchat, Facebook…) partition storage,
 // which breaks Google/Firebase sign-in. Detect them so we can tell the user to
@@ -11,6 +12,10 @@ function isInAppBrowser(): boolean {
   if (typeof navigator === "undefined") return false;
   const ua = navigator.userAgent || "";
   return /FBAN|FBAV|FB_IAB|Instagram|Line\/|TikTok|musical_ly|BytedanceWebview|Snapchat|Pinterest|LinkedInApp|GSA\//i.test(ua);
+}
+
+function errorCode(e: unknown): string {
+  return e && typeof e === "object" && "code" in e ? String((e as { code?: string }).code) : "";
 }
 
 function LoginForm() {
@@ -24,11 +29,9 @@ function LoginForm() {
     setInApp(isInAppBrowser());
   }, []);
 
-  const handleLogin = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const cred = await signInWithGoogle();
+  // Exchange a Google credential for a server session cookie, then route on.
+  const establishSession = useCallback(
+    async (cred: UserCredential) => {
       const idToken = await cred.user.getIdToken();
       const res = await fetch("/api/auth/session", {
         method: "POST",
@@ -39,17 +42,55 @@ function LoginForm() {
       if (!res.ok) {
         await signOutClient();
         setError(body.error || "Sign-in failed.");
+        setLoading(false);
         return;
       }
-      const staff = ["admin"].includes(body.role);
+      const staff = ["admin", "exec"].includes(body.role);
       const next = params.get("next");
       // Hard navigation (not router.push) so the just-set session cookie is sent
       // with the request — a client nav can race the cookie and bounce a brand-new
       // user back to sign-in until they refresh.
       window.location.assign(next || (staff ? "/admin" : "/dashboard"));
+    },
+    [params]
+  );
+
+  // If the browser blocked the popup we fell back to a redirect; finish it here
+  // when the user comes back to this page.
+  useEffect(() => {
+    let active = true;
+    completeRedirectSignIn()
+      .then((cred) => {
+        if (!active || !cred) return;
+        setLoading(true);
+        establishSession(cred);
+      })
+      .catch((e) => {
+        if (!active) return;
+        setError(e instanceof Error ? e.message : "Sign-in failed.");
+      });
+    return () => {
+      active = false;
+    };
+  }, [establishSession]);
+
+  const handleLogin = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const cred = await signInWithGoogle();
+      if (cred) {
+        await establishSession(cred); // popup path
+      }
+      // null = popup was blocked and a redirect started; the page is navigating
+      // away, so leave the loading state on.
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Sign-in failed.");
-    } finally {
+      const code = errorCode(e);
+      setError(
+        code === "auth/popup-closed-by-user"
+          ? "The sign-in window was closed before finishing. Tap Continue with Google to try again."
+          : e instanceof Error ? e.message : "Sign-in failed."
+      );
       setLoading(false);
     }
   };
