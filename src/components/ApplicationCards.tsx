@@ -80,49 +80,52 @@ function FileLink({ label, url }: { label: string; url?: string }) {
   );
 }
 
-function InterviewSchedule({ team, link, copied, onCopy }: { team: string; link: string | null; copied: boolean; onCopy: (link: string) => void }) {
+/** Turn bare http(s) URLs in admin-written text into links; keep line breaks. */
+function RichText({ text }: { text: string }) {
+  const parts = text.split(/(https?:\/\/[^\s<>"')\]]+)/g);
   return (
-    <div className="border-t border-white/10 p-7">
-      <p className="t-eyebrow">Schedule your interview</p>
-      {link ? (
-        <>
-          <div className="mt-3 flex items-start gap-2.5 rounded-2xl p-4"
-            style={{ background: "color-mix(in srgb, var(--color-warn) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--color-warn) 40%, transparent)" }}>
-            <span className="mt-0.5 shrink-0" style={{ color: "var(--color-warn)" }}>⚠</span>
-            <p className="text-[12.5px] font-medium leading-relaxed" style={{ color: "var(--color-warn)" }}>
-              Do not distribute this link. It is for your use only — sharing it could let someone else book your interview slot.
-            </p>
-          </div>
-          <div className="mt-3 rounded-2xl p-4" style={{ background: "var(--color-surface-2)", border: "1px solid rgba(255,255,255,0.1)" }}>
-            <p className="text-[12px] text-muted">Your signup link — {team}</p>
-            <p className="mt-1 break-all text-[13px]">{link}</p>
-            <div className="mt-4 flex flex-wrap items-center gap-2">
-              <a href={link} target="_blank" rel="noreferrer" className="pill pill-blue !px-4 !py-2 !text-[13px]">Open signup form ↗</a>
-              <button type="button" onClick={() => onCopy(link)} className="pill pill-ghost !px-4 !py-2 !text-[13px]">{copied ? "Copied ✓" : "Copy link"}</button>
-            </div>
-          </div>
-        </>
-      ) : (
-        <p className="t-body mt-3 text-muted">Your interview signup link isn&apos;t available yet. Please check back soon.</p>
+    <p className="whitespace-pre-wrap text-[14px] leading-relaxed">
+      {parts.map((part, i) =>
+        /^https?:\/\//.test(part)
+          ? <a key={i} href={part} target="_blank" rel="noreferrer" className="break-all font-medium text-accent underline underline-offset-2 hover:opacity-80">{part}</a>
+          : <span key={i}>{part}</span>
       )}
-    </div>
+    </p>
   );
 }
 
-export default function ApplicationCards({ cards, formData, interviewLink = null }: { cards: AppCard[]; formData: FormData; interviewLink?: string | null }) {
-  const [open, setOpen] = useState<string | null>(null);
-  const [copiedKey, setCopiedKey] = useState<string | null>(null);
+/** Shown once, above the cards, when any track is at the interview stage. */
+function InterviewSchedule({ message, interviewCount }: { message: string | null; interviewCount: number }) {
+  return (
+    <section className="card p-7" style={{ border: "1px solid color-mix(in srgb, var(--color-accent) 45%, transparent)" }}>
+      <p className="t-eyebrow">Schedule your interview</p>
+      {interviewCount > 1 && (
+        <div className="mt-4 flex items-start gap-2.5 rounded-2xl p-4"
+          style={{ background: "color-mix(in srgb, var(--color-danger) 15%, transparent)", border: "1px solid var(--color-danger)" }}>
+          <span className="mt-0.5 shrink-0 text-[16px]" style={{ color: "var(--color-danger)" }}>⚠</span>
+          <p className="text-[13px] font-bold leading-relaxed" style={{ color: "var(--color-danger)" }}>
+            You&apos;re interviewing for {interviewCount} roles — please book ONLY ONE interview.
+          </p>
+        </div>
+      )}
+      {message ? (
+        <div className="mt-4 rounded-2xl p-5" style={{ background: "var(--color-surface-2)" }}>
+          <RichText text={message} />
+        </div>
+      ) : (
+        <p className="t-body mt-3 text-muted">Interview scheduling details aren&apos;t available yet. Please check back soon.</p>
+      )}
+    </section>
+  );
+}
 
-  const copyLink = (key: string, link: string) => {
-    try {
-      navigator.clipboard?.writeText(link);
-      setCopiedKey(key);
-      setTimeout(() => setCopiedKey((k) => (k === key ? null : k)), 2000);
-    } catch {}
-  };
+export default function ApplicationCards({ cards, formData, interviewMessage = null }: { cards: AppCard[]; formData: FormData; interviewMessage?: string | null }) {
+  const [open, setOpen] = useState<string | null>(null);
+  const interviewCount = cards.filter((c) => c.status === "interview").length;
 
   return (
     <div className="mt-4 space-y-4">
+      {interviewCount > 0 && <InterviewSchedule message={interviewMessage} interviewCount={interviewCount} />}
       {cards.map((c) => {
         const p = STATUS_PRESENTATION[c.status];
         const expanded = open === c.key;
@@ -149,15 +152,6 @@ export default function ApplicationCards({ cards, formData, interviewLink = null
               <Stepper status={c.status} />
               <p className="t-body mt-5 text-muted">{p.message}</p>
             </button>
-
-            {c.status === "interview" && (
-              <InterviewSchedule
-                team={c.teams.join(", ")}
-                link={interviewLink}
-                copied={copiedKey === `sched:${c.key}`}
-                onCopy={(link) => copyLink(`sched:${c.key}`, link)}
-              />
-            )}
 
             {expanded && (
               <div className="animate-fade-slide-down border-t border-white/10 p-7">

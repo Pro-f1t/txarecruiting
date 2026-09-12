@@ -1,15 +1,13 @@
 import { requireStaff } from "@/lib/auth/guard";
 import { getAllApplications } from "@/lib/firebase/applications";
-import { getInterviewSignupLink } from "@/lib/firebase/config";
 import { getScores } from "@/lib/firebase/scores";
-import InterviewLinkControl from "@/components/InterviewLinkControl";
 import { ApplicationStatus } from "@/lib/models/Application";
 import { TEAMS } from "@/lib/models/User";
 import ReviewBoard, { type ReviewItem, type Track } from "@/components/ReviewBoard";
 
 export default async function AdminInterviews() {
   const { uid } = await requireStaff();
-  const [apps, interviewScores, reviewScores, signupLink] = await Promise.all([getAllApplications(), getScores("interview"), getScores("review"), getInterviewSignupLink()]);
+  const [apps, interviewScores, reviewScores] = await Promise.all([getAllApplications(), getScores("interview"), getScores("review")]);
   const submitted = apps.filter((a) => a.status === ApplicationStatus.SUBMITTED);
 
   const index = (list: typeof interviewScores) => {
@@ -63,8 +61,6 @@ export default async function AdminInterviews() {
       <p className="t-body mt-2 max-w-[70ch] text-muted">
         Only applicants advanced from application review appear here. Score their interviews 1–10, then use the ranking to make the final accept/reject decision.
       </p>
-
-      <div className="mt-6"><InterviewLinkControl current={signupLink} /></div>
 
       <div className="mt-6">
         {tracks.length === 0 ? (

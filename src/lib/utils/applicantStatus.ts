@@ -15,14 +15,14 @@ export function statusFromDecisions(review: StageDecision[], final: StageDecisio
   const allFinalRejected = final.length > 0 && final.every((d) => d === "rejected");
 
   // Application-stage rejection becomes visible at interview release.
-  if (isAtOrPast(step, RecruitingStep.RELEASE_INTERVIEWS) && allReviewRejected && !anyReviewAdvanced) {
+  if (isAtOrPast(step, RecruitingStep.INTERVIEWING) && allReviewRejected && !anyReviewAdvanced) {
     return "rejected_application";
   }
   if (isAtOrPast(step, RecruitingStep.RELEASE_DECISIONS)) {
     if (anyFinalAdvanced) return "accepted";
     if (allFinalRejected) return "rejected_interview";
   }
-  if (isAtOrPast(step, RecruitingStep.RELEASE_INTERVIEWS) && anyReviewAdvanced) return "interview";
+  if (isAtOrPast(step, RecruitingStep.INTERVIEWING) && anyReviewAdvanced) return "interview";
   return "submitted";
 }
 

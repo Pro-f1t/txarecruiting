@@ -1,14 +1,16 @@
 import { redirect } from "next/navigation";
 import { requireStaff, guardErrorStatus } from "@/lib/auth/guard";
-import { UserRole } from "@/lib/models/User";
+import { UserRole, canReviewApplications } from "@/lib/models/User";
 import AdminNav from "@/components/AdminNav";
 import RefreshButton from "@/components/RefreshButton";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   let isAdmin = false;
+  let canReview = false;
   try {
     const { user } = await requireStaff();
     isAdmin = user.role === UserRole.ADMIN;
+    canReview = canReviewApplications(user);
   } catch (error) {
     if (guardErrorStatus(error) === 403) redirect("/dashboard");
     redirect("/auth/login");
@@ -20,7 +22,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <RefreshButton />
       </div>
       <div className="mt-4">
-        <AdminNav isAdmin={isAdmin} />
+        <AdminNav isAdmin={isAdmin} canReview={canReview} />
       </div>
       <div className="mt-8">{children}</div>
     </section>

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { requireAdmin, guardErrorStatus } from "@/lib/auth/guard";
+import { requireApplicationReviewer, guardErrorStatus } from "@/lib/auth/guard";
 import { getApplication } from "@/lib/firebase/applications";
 import { getUser } from "@/lib/firebase/users";
 import { getConversationsForApplicant } from "@/lib/firebase/conversations";
@@ -16,7 +16,7 @@ export default async function ReviewDetail({
 }) {
   let uid: string;
   try {
-    ({ uid } = await requireAdmin());
+    ({ uid } = await requireApplicationReviewer());
   } catch (e) {
     redirect(guardErrorStatus(e) === 403 ? "/admin" : "/auth/login");
   }

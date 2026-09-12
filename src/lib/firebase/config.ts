@@ -1,10 +1,12 @@
 import { adminDb } from "./admin";
-import { RecruitingStep } from "@/lib/models/Config";
+import { LEGACY_STEP, RecruitingStep } from "@/lib/models/Config";
 
 /** The current global recruiting step (config/recruiting.currentStep). */
 export async function getRecruitingStep(): Promise<RecruitingStep> {
   const doc = await adminDb.doc("config/recruiting").get();
-  const step = doc.exists ? (doc.data()?.currentStep as RecruitingStep) : undefined;
+  const raw = doc.exists ? (doc.data()?.currentStep as string | undefined) : undefined;
+  if (raw && raw in LEGACY_STEP) return LEGACY_STEP[raw];
+  const step = raw as RecruitingStep | undefined;
   return step && Object.values(RecruitingStep).includes(step) ? step : RecruitingStep.OPEN;
 }
 
@@ -12,15 +14,19 @@ export async function setRecruitingStep(step: RecruitingStep, by: string): Promi
   await adminDb.doc("config/recruiting").set({ currentStep: step, updatedAt: new Date(), updatedBy: by }, { merge: true });
 }
 
-/** A single general interview signup link (config/interviews.signupLink). */
-export async function getInterviewSignupLink(): Promise<string | null> {
+/**
+ * The interview scheduling message shown to every interview-stage applicant
+ * (config/interviews.message). Free text — admins put the room links, times,
+ * and instructions in here. Empty/missing = "not available yet" placeholder.
+ */
+export async function getInterviewMessage(): Promise<string | null> {
   const doc = await adminDb.doc("config/interviews").get();
-  const link = doc.exists ? (doc.data()?.signupLink as string | undefined) : undefined;
-  return link && link.trim() ? link.trim() : null;
+  const message = doc.exists ? (doc.data()?.message as string | undefined) : undefined;
+  return message && message.trim() ? message : null;
 }
 
-export async function setInterviewSignupLink(link: string, by: string): Promise<void> {
-  await adminDb.doc("config/interviews").set({ signupLink: link.trim(), updatedAt: new Date(), updatedBy: by }, { merge: true });
+export async function setInterviewMessage(message: string, by: string): Promise<void> {
+  await adminDb.doc("config/interviews").set({ message: message.trim(), updatedAt: new Date(), updatedBy: by }, { merge: true });
 }
 
 // Tier-2 break-glass check-in: a static QR an exec arms from their phone when the

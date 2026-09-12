@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { adminAuth } from "@/lib/firebase/admin";
 import { getUser } from "@/lib/firebase/users";
-import { STAFF_ROLES, UserRole } from "@/lib/models/User";
+import { STAFF_ROLES, UserRole, canReviewApplications } from "@/lib/models/User";
 
 /**
  * Verify the Firebase session cookie server-side and return the user.
@@ -42,6 +42,15 @@ export async function requireAdmin() {
   const result = await requireSessionUser();
   if (result.user.role !== UserRole.ADMIN) {
     throw new Error("Forbidden: Admin access required");
+  }
+  return result;
+}
+
+/** Admins, plus execs an admin has granted Application review. */
+export async function requireApplicationReviewer() {
+  const result = await requireStaff();
+  if (!canReviewApplications(result.user)) {
+    throw new Error("Forbidden: Application review access required");
   }
   return result;
 }

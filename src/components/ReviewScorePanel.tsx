@@ -19,6 +19,7 @@ export default function ReviewScorePanel({
 
   const save = async () => {
     if (score == null) { setMsg("Pick a score first."); return; }
+    if (comment.trim().length === 0) { setMsg("Add a comment explaining your score."); return; }
     setBusy(true); setMsg(null);
     try {
       const res = await fetch(`/api/admin/applications/${appId}/score`, {
@@ -81,13 +82,13 @@ export default function ReviewScorePanel({
       </div>
 
       <label className="mt-5 block">
-        <span className="mb-2 block text-[13px] text-muted">Comment (optional)</span>
-        <textarea rows={3} value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Notes on this applicant…"
-          className="w-full rounded-2xl px-4 py-3 text-[14px] text-white outline-none" style={{ background: "var(--color-surface-2)", border: "1px solid rgba(255,255,255,0.1)" }} />
+        <span className="mb-2 block text-[13px] text-muted">Comment <span className="text-danger">*</span></span>
+        <textarea rows={7} value={comment} onChange={(e) => setComment(e.target.value)} placeholder="What stood out (good or bad), specific examples from their answers, and any reservations. Other reviewers will read this."
+          className="w-full resize-y rounded-2xl px-4 py-3 text-[14px] leading-relaxed text-white outline-none" style={{ background: "var(--color-surface-2)", border: "1px solid rgba(255,255,255,0.1)", minHeight: 168 }} />
       </label>
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
-        <button onClick={save} disabled={busy} className="pill pill-blue disabled:opacity-50">{busy ? "Saving…" : myScore != null ? "Update score" : "Save score"}</button>
+        <button onClick={save} disabled={busy || score == null || comment.trim().length === 0} title={comment.trim().length === 0 ? "A comment is required" : undefined} className="pill pill-blue disabled:opacity-50">{busy ? "Saving…" : myScore != null ? "Update score" : "Save score"}</button>
         {myScore != null && <button onClick={clear} disabled={busy} className="pill pill-ghost">Clear my score</button>}
         {msg && <span className="text-[13px]" style={{ color: msg === "Saved" || msg === "Cleared" ? "var(--color-ok)" : "var(--color-danger)" }}>{msg}</span>}
       </div>

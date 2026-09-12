@@ -12,6 +12,7 @@ export function toUser(data: any): User {
     role: (data.role as UserRole) ?? UserRole.APPLICANT,
     team: data.team,
     blacklisted: !!data.blacklisted,
+    canReviewApplications: data.canReviewApplications === true,
     attendedEventIds: data.attendedEventIds ?? [],
     applications: data.applications ?? [],
     createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : data.createdAt,
@@ -20,6 +21,10 @@ export function toUser(data: any): User {
 
 export async function setUserRole(uid: string, role: UserRole): Promise<void> {
   await adminDb.collection(USERS).doc(uid).update({ role });
+}
+
+export async function setCanReviewApplications(uid: string, allowed: boolean): Promise<void> {
+  await adminDb.collection(USERS).doc(uid).update({ canReviewApplications: allowed });
 }
 
 export async function getUser(uid: string): Promise<User | null> {

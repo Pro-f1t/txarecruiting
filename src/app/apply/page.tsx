@@ -24,7 +24,7 @@ export default async function ApplyPage() {
     ? { memberTeams: app.memberTeams, leadTeams: app.leadTeams, formData: app.formData as unknown as Record<string, unknown>, status: app.status }
     : null;
 
-  if (closed) {
+  if (closed && !app) {
     return (
       <section className="shell pt-28 pb-24">
         <p className="t-eyebrow">{SEASON} application</p>
@@ -45,12 +45,22 @@ export default async function ApplyPage() {
   return (
     <section className="shell pt-28 pb-24">
       <p className="t-eyebrow">{SEASON} application</p>
-      <h1 className="h-display mt-3 max-w-[20ch]">{SEASON} Application</h1>
-      <p className="t-body mt-4 max-w-[60ch] text-muted">
-        Pick the field team(s) you want to join — you can choose more than one — answer a few
-        questions, and optionally apply to be a field team lead too. You can edit your application
-        any time before the deadline.
-      </p>
+      <h1 className="h-display mt-3 max-w-[20ch]">{closed ? "Your application" : `${SEASON} Application`}</h1>
+      {closed ? (
+        <div className="card mt-6 max-w-[60ch] p-6">
+          <span className="badge badge-danger">Closed</span>
+          <p className="t-body mt-3 text-muted">
+            The review period has begun, so your application is read-only. Track your status on your{" "}
+            <Link href="/dashboard" className="text-accent hover:underline">dashboard</Link>.
+          </p>
+        </div>
+      ) : (
+        <p className="t-body mt-4 max-w-[60ch] text-muted">
+          Pick the field team(s) you want to join — you can choose more than one — answer a few
+          questions, and optionally apply to be a field team lead too. You can edit your application
+          any time before the deadline.
+        </p>
+      )}
 
       <ApplyForm
         uid={uid}

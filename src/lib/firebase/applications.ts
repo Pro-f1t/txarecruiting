@@ -79,6 +79,22 @@ export async function setDecision(
   await adminDb.collection(COL).doc(appId).update(new FieldPath(field, key), decision, "updatedAt", new Date());
 }
 
+/** Reset every decision for one track at one stage back to "pending". Returns how many changed. */
+export async function clearDecisionsForTrack(appIds: string[], key: string, stage: "review" | "final"): Promise<number> {
+  const field = stage === "review" ? "reviewDecisions" : "finalDecisions";
+  let changed = 0;
+  // Firestore batches cap at 500 writes; chunk to stay under.
+  for (let i = 0; i < appIds.length; i += 400) {
+    const batch = adminDb.batch();
+    for (const id of appIds.slice(i, i + 400)) {
+      batch.update(adminDb.collection(COL).doc(id), new FieldPath(field, key), "pending", "updatedAt", new Date());
+      changed += 1;
+    }
+    await batch.commit();
+  }
+  return changed;
+}
+
 /**
  * Create or update the applicant's single application. Editable before the
  * deadline — submitting again overwrites the previous answers/selections.

@@ -1,6 +1,7 @@
 // User roles. ADMIN runs the whole console. EXEC is a reduced-access reviewer:
-// can grade interviews, but cannot touch the recruiting step, grade
-// applications, or manage roles. APPLICANT applies. (The member/lead
+// can grade interviews, but cannot touch the recruiting step or manage roles.
+// Execs cannot grade applications unless an admin grants them the
+// `canReviewApplications` permission on the Users tab. APPLICANT applies. (The member/lead
 // distinction lives on the APPLICATION, not here — see ApplicantRole.)
 export enum UserRole {
   ADMIN = "admin",
@@ -38,9 +39,18 @@ export interface User {
   // For staff scoped to a team (captain/lead/reviewer): which team.
   team?: Team;
   blacklisted: boolean;
+  // Admin-granted permission: lets an exec use Application review (score +
+  // advance/reject at the review stage). Admins always can; applicants never.
+  canReviewApplications?: boolean;
   // Event attendance gate: check-ins that satisfy the apply requirement.
   // A user may apply once they have >=1 info_session AND >=1 coffee_chat this season.
   attendedEventIds?: string[];
   applications: string[];
   createdAt?: Date;
+}
+
+/** Can this user grade applications and make review-stage decisions? */
+export function canReviewApplications(user: Pick<User, "role" | "canReviewApplications">): boolean {
+  if (user.role === UserRole.ADMIN) return true;
+  return user.role === UserRole.EXEC && user.canReviewApplications === true;
 }

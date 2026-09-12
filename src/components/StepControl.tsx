@@ -5,11 +5,11 @@ import { useRouter } from "next/navigation";
 import { RecruitingStep, STEP_ORDER, STEP_LABELS } from "@/lib/models/Config";
 
 const HINTS: Partial<Record<RecruitingStep, string>> = {
-  [RecruitingStep.RELEASE_INTERVIEWS]: "Reveals interview decisions to applicants (advanced → Interview, rejected → Not selected).",
+  [RecruitingStep.INTERVIEWING]: "Reveals interview decisions to applicants (advanced → Interview + your scheduling message, rejected → Not selected).",
   [RecruitingStep.RELEASE_DECISIONS]: "Reveals final decisions (Accepted / Not selected).",
 };
 
-type Readiness = { undecidedReview: number; undecidedFinal: number; interviewLinkSet: boolean };
+type Readiness = { undecidedReview: number; undecidedFinal: number; interviewMessageSet: boolean };
 
 export default function StepControl({ current, readiness }: { current: RecruitingStep; readiness: Readiness }) {
   const router = useRouter();
@@ -42,12 +42,9 @@ export default function StepControl({ current, readiness }: { current: Recruitin
 
   // Failsafe checks relevant to the target step.
   const warnings: string[] = [];
-  if (step === RecruitingStep.RELEASE_INTERVIEWS) {
+  if (step === RecruitingStep.INTERVIEWING) {
     if (readiness.undecidedReview > 0) warnings.push(`${readiness.undecidedReview} application-review decision${readiness.undecidedReview === 1 ? " is" : "s are"} still pending — those applicants have no Interview/Reject yet.`);
-    if (!readiness.interviewLinkSet) warnings.push("No interview signup link is set — interview-stage applicants will see a placeholder instead of a link.");
-  }
-  if (step === RecruitingStep.INTERVIEWING && !readiness.interviewLinkSet) {
-    warnings.push("No interview signup link is set — applicants can't book their interviews.");
+    if (!readiness.interviewMessageSet) warnings.push("No interview scheduling message is set — applicants won't know how to book their interview.");
   }
   if (step === RecruitingStep.RELEASE_DECISIONS && readiness.undecidedFinal > 0) {
     warnings.push(`${readiness.undecidedFinal} interview decision${readiness.undecidedFinal === 1 ? " is" : "s are"} still pending — those interviewees have no Accept/Reject yet.`);

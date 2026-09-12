@@ -42,6 +42,7 @@ export default function ReviewBoard({
   const [topN, setTopN] = useState<number>(0);
   const [busy, setBusy] = useState<string | null>(null);
   const [sortByScore, setSortByScore] = useState(false);
+  const [confirmClear, setConfirmClear] = useState(false);
 
   const rawItems = itemsByTrack[track] ?? [];
   const scoreOf = (it: ReviewItem) => (dualScore ? overall(it.priorAvg, it.avg) : it.avg) ?? -1;
@@ -70,6 +71,21 @@ export default function ReviewBoard({
         });
       }
       router.refresh();
+    } finally { setBusy(null); }
+  };
+
+  const decidedCount = items.filter((i) => i.decision === "advanced" || i.decision === "rejected").length;
+  const trackLabel = tracks.find((t) => t.key === track)?.label ?? track;
+
+  const clearAll = async () => {
+    setConfirmClear(false);
+    setBusy("clearAll");
+    try {
+      const res = await fetch("/api/admin/applications/decisions/clear", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key: track, stage: decisionStage }),
+      });
+      if (res.ok) router.refresh();
     } finally { setBusy(null); }
   };
 
@@ -105,8 +121,32 @@ export default function ReviewBoard({
           <button onClick={advanceTopN} disabled={busy === "topN" || !topN} className="pill pill-blue !px-4 !py-1.5 !text-[13px] disabled:opacity-50">
             {busy === "topN" ? "Advancing…" : "Advance"}
           </button>
+          <button onClick={() => setConfirmClear(true)} disabled={busy === "clearAll" || decidedCount === 0}
+            title={decidedCount === 0 ? "No decisions to clear in this track" : `Reset all ${decidedCount} ${advanceLabel}/Reject decisions in this track`}
+            className="rounded-full px-4 py-1.5 text-[13px] font-semibold transition-colors disabled:opacity-40"
+            style={{ background: "rgba(255,255,255,0.06)", color: "var(--color-muted)", border: "1px solid rgba(255,255,255,0.12)" }}>
+            {busy === "clearAll" ? "Clearing…" : "Clear all decisions"}
+          </button>
         </div>
       </div>
+
+      {confirmClear && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6" style={{ background: "rgba(0,0,0,0.6)" }} onClick={() => setConfirmClear(false)}>
+          <div className="card w-full max-w-sm p-7" onClick={(e) => e.stopPropagation()}>
+            <p className="t-eyebrow">Clear all decisions</p>
+            <p className="t-body mt-3">
+              Reset every <span className="font-semibold text-white">{advanceLabel}</span> and <span className="font-semibold text-white">Reject</span> decision in <span className="font-semibold text-white">{trackLabel}</span> back to pending?
+              <span className="mt-2 block text-muted">{decidedCount} applicant{decidedCount === 1 ? "" : "s"} affected. Scores are kept.</span>
+            </p>
+            <div className="mt-6 flex justify-end gap-2">
+              <button onClick={() => setConfirmClear(false)} className="pill pill-ghost !px-4 !py-2 !text-[13px]">Cancel</button>
+              <button onClick={clearAll} className="rounded-full px-4 py-2 text-[13px] font-semibold" style={{ background: "var(--color-danger)", color: "#08050f" }}>
+                Clear {decidedCount}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="mt-4 space-y-2">
         {items.length === 0 && <p className="t-body text-muted">No applicants in this track.</p>}

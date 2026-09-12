@@ -13,13 +13,22 @@ function QA({ label, value }: { label: string; value?: string }) {
     </div>
   );
 }
-function FileLink({ label, url }: { label: string; url?: string }) {
+function hostOf(url: string): string {
+  try { return new URL(url).hostname.replace(/^www\./, ""); } catch { return url; }
+}
+/** A prominent, clickable file/link row: label, where it goes, and an Open button. */
+function LinkRow({ label, url }: { label: string; url?: string }) {
   if (!url) return null;
   return (
-    <div>
-      <p className="text-[12px] uppercase tracking-wider text-muted">{label}</p>
-      <a href={url} target="_blank" rel="noreferrer" className="mt-1 inline-block text-[14px] font-medium text-accent hover:underline">Open ↗</a>
-    </div>
+    <a href={url} target="_blank" rel="noreferrer"
+      className="group flex flex-wrap items-center justify-between gap-3 rounded-2xl p-3.5 transition-colors hover:bg-white/[0.06]"
+      style={{ background: "var(--color-surface-2)", border: "1px solid rgba(255,255,255,0.08)" }}>
+      <div className="min-w-0">
+        <p className="text-[14px] font-medium group-hover:text-accent">{label}</p>
+        <p className="truncate text-[12px] text-muted">{hostOf(url)} · <span className="opacity-70">{url}</span></p>
+      </div>
+      <span className="pill pill-blue !px-4 !py-1.5 !text-[13px] shrink-0">Open ↗</span>
+    </a>
   );
 }
 
@@ -112,7 +121,12 @@ export default function ApplicationAnswers({ app, attendedEventIds = [], convers
               {app.leadTeams.map((t) => (
                 <QA key={t} label={`Skills/experience for ${t}`} value={fd.leadAnswers?.leadSkills?.[t]} />
               ))}
-              <FileLink label="Work sample/portfolio" url={fd.leadAnswers?.workSample} />
+              <div>
+                <p className="text-[12px] uppercase tracking-wider text-muted">Work sample / portfolio</p>
+                {fd.leadAnswers?.workSample
+                  ? <div className="mt-2"><LinkRow label="Open work sample" url={fd.leadAnswers.workSample} /></div>
+                  : <p className="mt-1 text-[14px] text-muted">None submitted.</p>}
+              </div>
             </div>
           </div>
         )}

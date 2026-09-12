@@ -171,6 +171,8 @@ export default function ApplyForm({
 
   return (
     <form onSubmit={onSubmit} className="mt-10 space-y-8">
+    {/* Read-only once applications close: one switch disables every field. */}
+    <fieldset disabled={!editable} className="min-w-0 space-y-8 disabled:opacity-90">
       {isEditing && (
         <div className="card flex items-center justify-between gap-4 p-6">
           <div>
@@ -379,6 +381,7 @@ export default function ApplyForm({
           </div>
         </div>
       )}
+    </fieldset>
     </form>
   );
 }

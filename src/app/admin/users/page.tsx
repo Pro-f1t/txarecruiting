@@ -9,7 +9,7 @@ export default async function AdminUsers() {
 
   const users = await getAllUsers();
   const rows: UserRow[] = users
-    .map((u) => ({ uid: u.uid, name: u.name, email: u.email, role: u.role }))
+    .map((u) => ({ uid: u.uid, name: u.name, email: u.email, role: u.role, canReviewApplications: u.canReviewApplications === true }))
     .sort((a, b) => ROLE_RANK[a.role as UserRole] - ROLE_RANK[b.role as UserRole] || a.name.localeCompare(b.name));
 
   return (
@@ -17,7 +17,7 @@ export default async function AdminUsers() {
       <h1 className="t-card-title">Users</h1>
       <p className="t-body mt-2 text-muted">
         {isAdmin
-          ? "Everyone who has signed in. Set each person as Admin, Exec, or Applicant."
+          ? "Everyone who has signed in. Set each person as Admin, Exec, or Applicant. Execs can also be given Application review access."
           : "Everyone who has signed in. Only admins can change roles."}
       </p>
       <div className="mt-6">

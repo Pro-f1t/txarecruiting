@@ -1,16 +1,16 @@
-import Link from "next/link";
 import { requireStaff } from "@/lib/auth/guard";
 import { getAllApplications } from "@/lib/firebase/applications";
-import { getRecruitingStep, getInterviewSignupLink } from "@/lib/firebase/config";
+import { getRecruitingStep, getInterviewMessage } from "@/lib/firebase/config";
 import { ApplicationStatus } from "@/lib/models/Application";
 import { STEP_LABELS } from "@/lib/models/Config";
 import { UserRole } from "@/lib/models/User";
 import StepControl from "@/components/StepControl";
+import InterviewMessageControl from "@/components/InterviewMessageControl";
 
 export default async function AdminOverview() {
   const { user } = await requireStaff();
   const isAdmin = user.role === UserRole.ADMIN;
-  const [apps, step, interviewLink] = await Promise.all([getAllApplications(), getRecruitingStep(), getInterviewSignupLink()]);
+  const [apps, step, interviewMessage] = await Promise.all([getAllApplications(), getRecruitingStep(), getInterviewMessage()]);
 
   const submitted = apps.filter((a) => a.status === ApplicationStatus.SUBMITTED);
   const drafts = apps.filter((a) => a.status === ApplicationStatus.IN_PROGRESS);
@@ -30,7 +30,7 @@ export default async function AdminOverview() {
       }
     }
   }
-  const readiness = { undecidedReview, undecidedFinal, interviewLinkSet: interviewLink != null };
+  const readiness = { undecidedReview, undecidedFinal, interviewMessageSet: interviewMessage != null };
 
   const started = submitted.length + drafts.length;
   const pctSubmitted = started > 0 ? Math.round((submitted.length / started) * 100) : 0;
@@ -65,13 +65,7 @@ export default async function AdminOverview() {
         </div>
       )}
 
-      <div className="card flex items-center justify-between gap-4 p-7">
-        <div>
-          <p className="t-eyebrow">Applications</p>
-          <p className="t-body mt-1 text-muted">Review applicants and record interview / final decisions.</p>
-        </div>
-        <Link href="/admin/applications" className="pill pill-blue">Open applications</Link>
-      </div>
+      <InterviewMessageControl current={interviewMessage} />
     </div>
   );
 }

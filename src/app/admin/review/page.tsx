@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { requireAdmin, guardErrorStatus } from "@/lib/auth/guard";
+import { requireApplicationReviewer, guardErrorStatus } from "@/lib/auth/guard";
 import { getAllApplications } from "@/lib/firebase/applications";
 import { getScores } from "@/lib/firebase/scores";
 import { ApplicationStatus } from "@/lib/models/Application";
@@ -9,7 +9,7 @@ import ReviewBoard, { type ReviewItem, type Track } from "@/components/ReviewBoa
 export default async function AdminReview() {
   let uid: string;
   try {
-    ({ uid } = await requireAdmin());
+    ({ uid } = await requireApplicationReviewer());
   } catch (e) {
     redirect(guardErrorStatus(e) === 403 ? "/admin" : "/auth/login");
   }
