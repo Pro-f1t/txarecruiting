@@ -40,6 +40,14 @@ export default async function AdminReview() {
       };
     });
 
+  // The signed-in reviewer's own review-stage scores, bucketed 1..10, for the "Your distribution" chart.
+  const mineList = scores.filter((s) => s.reviewerUid === uid);
+  const mine = {
+    counts: Array.from({ length: 10 }, (_, i) => mineList.filter((s) => s.score === i + 1).length),
+    total: mineList.length,
+    mean: mineList.length ? mineList.reduce((sum, s) => sum + s.score, 0) / mineList.length : null,
+  };
+
   const tracks: Track[] = [];
   const itemsByTrack: Record<string, ReviewItem[]> = {};
 
@@ -64,7 +72,7 @@ export default async function AdminReview() {
         Everyone scores applicants 1–10 (async). Members are one general pool; each field-team lead is its own track.
         Once scored, use the ranking to decide who moves to interviews — advance individually or set a cutoff with &ldquo;Advance top N.&rdquo;
       </p>
-      <div className="mt-6"><ScoringGuideCallout /></div>
+      <div className="mt-6"><ScoringGuideCallout mine={mine} /></div>
       <div className="mt-6">
         {tracks.length === 0 ? (
           <p className="t-body text-muted">No submitted applications to review yet.</p>

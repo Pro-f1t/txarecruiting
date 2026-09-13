@@ -2,7 +2,28 @@
 // every reviewer's scores land on a similar bell curve and stay comparable.
 const CURVE = [2, 4, 8, 14, 20, 20, 14, 8, 4, 2]; // illustrative %, scores 1..10
 
-export default function ScoringGuideCallout({ compact = false }: { compact?: boolean }) {
+type Mine = { counts: number[]; total: number; mean: number | null };
+
+function Histogram({ values, highlightIdx, tone, maxOverride }: { values: number[]; highlightIdx?: (i: number) => boolean; tone: string; maxOverride?: number }) {
+  const max = Math.max(1, maxOverride ?? Math.max(...values));
+  return (
+    <>
+      <div className="mt-2 flex h-[88px] items-end gap-1">
+        {values.map((v, i) => (
+          <div key={i} className="flex w-6 flex-col items-center justify-end gap-1">
+            {v > 0 && <span className="text-[10px] leading-none text-muted tabular-nums">{v}</span>}
+            <div className="w-full rounded-t-md" style={{ height: `${Math.max(v > 0 ? 3 : 0, (v / max) * 72)}px`, background: highlightIdx?.(i) ? tone : `color-mix(in srgb, ${tone} 45%, transparent)` }} />
+          </div>
+        ))}
+      </div>
+      <div className="mt-1 flex gap-1">
+        {values.map((_, i) => <span key={i} className="w-6 text-center text-[11px] text-muted tabular-nums">{i + 1}</span>)}
+      </div>
+    </>
+  );
+}
+
+export default function ScoringGuideCallout({ compact = false, mine }: { compact?: boolean; mine?: Mine }) {
   if (compact) {
     return (
       <p className="mt-2 text-[12.5px] leading-relaxed" style={{ color: "var(--color-warn)" }}>
@@ -24,18 +45,26 @@ export default function ScoringGuideCallout({ compact = false }: { compact?: boo
           </ul>
           <p className="mt-3 text-[13px] text-muted">We compare raw scores across reviewers without adjustment, so a generous grader and a strict grader would skew the ranking. Grading on the same curve is what keeps it fair.</p>
         </div>
-        <div className="shrink-0" aria-label="Ideal score distribution: a bell curve centred on 5 and 6">
-          <p className="text-[11px] uppercase tracking-wider text-muted">Ideal spread of your scores</p>
-          <div className="mt-2 flex h-[88px] items-end gap-1">
-            {CURVE.map((h, i) => (
-              <div key={i} className="flex w-6 flex-col items-center justify-end gap-1">
-                <div className="w-full rounded-t-md" style={{ height: `${h * 3.6}px`, background: i >= 4 && i <= 5 ? "var(--color-warn)" : "color-mix(in srgb, var(--color-warn) 45%, transparent)" }} />
-              </div>
-            ))}
+        <div className="flex shrink-0 flex-wrap gap-8">
+          <div aria-label="Ideal score distribution: a bell curve centred on 5 and 6">
+            <p className="text-[11px] uppercase tracking-wider text-muted">Ideal spread</p>
+            <Histogram values={CURVE} highlightIdx={(i) => i === 4 || i === 5} tone="var(--color-warn)" />
           </div>
-          <div className="mt-1 flex gap-1">
-            {CURVE.map((_, i) => <span key={i} className="w-6 text-center text-[11px] text-muted tabular-nums">{i + 1}</span>)}
-          </div>
+          {mine && (
+            <div aria-label="Your current score distribution">
+              <p className="text-[11px] uppercase tracking-wider text-muted">
+                Your distribution
+                {mine.total > 0 && <span className="ml-2 normal-case tracking-normal text-white">{mine.total} score{mine.total === 1 ? "" : "s"} · avg {mine.mean!.toFixed(1)}</span>}
+              </p>
+              {mine.total > 0 ? (
+                <Histogram values={mine.counts} highlightIdx={(i) => mine.counts[i] === Math.max(...mine.counts)} tone="var(--color-accent)" />
+              ) : (
+                <div className="mt-2 flex h-[88px] w-[276px] items-center justify-center rounded-2xl text-[13px] text-muted" style={{ background: "rgba(255,255,255,0.04)" }}>
+                  No scores yet — your bars appear here as you grade.
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
