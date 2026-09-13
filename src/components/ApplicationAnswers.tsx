@@ -4,11 +4,23 @@ import { EVENTS, EVENT_TYPE_LABEL } from "@/data/events";
 
 const TYPE_BADGE: Record<string, string> = { info_session: "badge-ok", coffee_chat: "badge-warn", deadline: "badge-danger" };
 
-function QA({ label, value }: { label: string; value?: string }) {
+const wordCount = (s: string) => (s.trim() ? s.trim().split(/\s+/).length : 0);
+
+/** `max` = the form's word limit for this answer; shows "(130/150 words)", red when over. */
+function QA({ label, value, max }: { label: string; value?: string; max?: number }) {
   if (!value) return null;
+  const words = max ? wordCount(value) : 0;
+  const over = max ? words > max : false;
   return (
     <div>
-      <p className="text-[12px] uppercase tracking-wider text-muted">{label}</p>
+      <p className="text-[12px] uppercase tracking-wider text-muted">
+        {label}
+        {max && (
+          <span className="ml-2 normal-case tracking-normal tabular-nums" style={{ color: over ? "var(--color-danger)" : "var(--color-muted)" }} title={over ? "Over the limit" : undefined}>
+            ({words}/{max} words)
+          </span>
+        )}
+      </p>
       <p className="mt-1 whitespace-pre-wrap text-[14px]">{value}</p>
     </div>
   );
@@ -97,8 +109,8 @@ export default function ApplicationAnswers({ app, attendedEventIds = [], convers
           <QA label="Major" value={major || undefined} />
           <QA label="Graduation year" value={fd.graduationYear} />
           <QA label="Phone" value={fd.phone} />
-          <div className="sm:col-span-2"><QA label="Why Texas Accelerate?" value={fd.whyJoin} /></div>
-          <div className="sm:col-span-2"><QA label="A project they've worked on" value={fd.project} /></div>
+          <div className="sm:col-span-2"><QA label="Why Texas Accelerate?" value={fd.whyJoin} max={150} /></div>
+          <div className="sm:col-span-2"><QA label="A project they've worked on" value={fd.project} max={150} /></div>
           {fd.imageUrl && (
             <div className="sm:col-span-2">
               <p className="text-[12px] uppercase tracking-wider text-muted">Uploaded image / file</p>
@@ -117,9 +129,9 @@ export default function ApplicationAnswers({ app, attendedEventIds = [], convers
           <div className="mt-7 border-t border-white/10 pt-6">
             <p className="t-eyebrow">Lead application</p>
             <div className="mt-4 space-y-5">
-              <QA label="Prior experience" value={fd.leadAnswers?.leadExperience} />
+              <QA label="Prior experience" value={fd.leadAnswers?.leadExperience} max={200} />
               {app.leadTeams.map((t) => (
-                <QA key={t} label={`Skills/experience for ${t}`} value={fd.leadAnswers?.leadSkills?.[t]} />
+                <QA key={t} label={`Skills/experience for ${t}`} value={fd.leadAnswers?.leadSkills?.[t]} max={150} />
               ))}
               <div>
                 <p className="text-[12px] uppercase tracking-wider text-muted">Work sample / portfolio</p>
