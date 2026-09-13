@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireStaff } from "@/lib/auth/guard";
-import { getApplication } from "@/lib/firebase/applications";
+import { getApplication, getTrackNeighbors } from "@/lib/firebase/applications";
 import { getUser } from "@/lib/firebase/users";
 import { getConversationsForApplicant } from "@/lib/firebase/conversations";
 import { getScoresForAppTrack } from "@/lib/firebase/scores";
 import ApplicationAnswers from "@/components/ApplicationAnswers";
 import ReviewScorePanel from "@/components/ReviewScorePanel";
+import ReviewNav from "@/components/ReviewNav";
 
 export default async function InterviewDetail({
   params, searchParams,
@@ -31,6 +32,8 @@ export default async function InterviewDetail({
   const track = rawTrack && interviewTracks.includes(rawTrack) ? rawTrack : interviewTracks[0];
   if (!track) notFound();
 
+  const nav = await getTrackNeighbors(id, track, true);
+
   const trackLabel = track === "member" ? "General member application" : `Field team lead — ${track.slice("lead:".length)}`;
 
   const [scores, reviewScores] = await Promise.all([
@@ -44,7 +47,10 @@ export default async function InterviewDetail({
 
   return (
     <div>
-      <Link href="/admin/interviews" className="text-[13px] text-muted hover:text-white">← Back to interview review</Link>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Link href="/admin/interviews" className="text-[13px] text-muted hover:text-white">← Back to interview review</Link>
+        <ReviewNav base="/admin/interviews" track={track} {...nav} />
+      </div>
       <div className="mt-4">
         <h1 className="t-card-title">{app.userName}</h1>
         <p className="text-[13px] text-muted">{app.userEmail}</p>

@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { requireApplicationReviewer, guardErrorStatus } from "@/lib/auth/guard";
-import { getApplication } from "@/lib/firebase/applications";
+import { getApplication, getTrackNeighbors } from "@/lib/firebase/applications";
 import { getUser } from "@/lib/firebase/users";
 import { getConversationsForApplicant } from "@/lib/firebase/conversations";
 import { getScoresForAppTrack } from "@/lib/firebase/scores";
 import ApplicationAnswers from "@/components/ApplicationAnswers";
 import ReviewScorePanel from "@/components/ReviewScorePanel";
+import ReviewNav from "@/components/ReviewNav";
 
 export default async function ReviewDetail({
   params, searchParams,
@@ -32,6 +33,8 @@ export default async function ReviewDetail({
   const track = rawTrack && validTracks.includes(rawTrack) ? rawTrack : validTracks[0];
   if (!track) notFound();
 
+  const nav = await getTrackNeighbors(id, track, false);
+
   const trackLabel = track === "member" ? "General member application" : `Field team lead — ${track.slice("lead:".length)}`;
 
   const scores = await getScoresForAppTrack(id, track, "review");
@@ -41,7 +44,10 @@ export default async function ReviewDetail({
 
   return (
     <div>
-      <Link href="/admin/review" className="text-[13px] text-muted hover:text-white">← Back to review</Link>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Link href="/admin/review" className="text-[13px] text-muted hover:text-white">← Back to review</Link>
+        <ReviewNav base="/admin/review" track={track} {...nav} />
+      </div>
       <div className="mt-4">
         <h1 className="t-card-title">{app.userName}</h1>
         <p className="text-[13px] text-muted">{app.userEmail}</p>

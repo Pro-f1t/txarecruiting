@@ -132,3 +132,20 @@ export async function upsertApplication(
   }
   return (await getApplication(meta.userId))!;
 }
+
+/**
+ * The applicants in one track, in review-board order (submission time), so a
+ * reviewer can step Prev/Next without going back to the board.
+ * `interviewOnly` restricts to tracks advanced from application review.
+ */
+export async function getTrackNeighbors(appId: string, track: string, interviewOnly = false): Promise<{ prevId: string | null; nextId: string | null; index: number; total: number; prevName?: string; nextName?: string }> {
+  const apps = (await getAllApplications())
+    .filter((a) => a.status === ApplicationStatus.SUBMITTED)
+    .filter((a) => (track === "member" ? a.memberTeams.length > 0 : (a.leadTeams as string[]).includes(track.slice("lead:".length))))
+    .filter((a) => !interviewOnly || a.reviewDecisions?.[track] === "advanced")
+    .sort((a, b) => +(a.submittedAt ?? 0) - +(b.submittedAt ?? 0));
+  const index = apps.findIndex((a) => a.id === appId);
+  const prev = index > 0 ? apps[index - 1] : null;
+  const next = index >= 0 && index < apps.length - 1 ? apps[index + 1] : null;
+  return { prevId: prev?.id ?? null, nextId: next?.id ?? null, index: Math.max(index, 0), total: apps.length, prevName: prev?.userName, nextName: next?.userName };
+}
