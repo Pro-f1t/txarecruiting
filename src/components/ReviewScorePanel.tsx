@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import ScoringGuideCallout from "@/components/ScoringGuideCallout";
 
 type Other = { reviewerName?: string; score: number; comment?: string };
 
@@ -69,6 +70,8 @@ export default function ReviewScorePanel({
           )}
         </div>
       )}
+
+      {stage === "review" && <ScoringGuideCallout compact />}
 
       {/* 1–10 scale */}
       <div className="mt-4 flex flex-wrap gap-2">

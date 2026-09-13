@@ -5,6 +5,7 @@ import { getScores } from "@/lib/firebase/scores";
 import { ApplicationStatus } from "@/lib/models/Application";
 import { TEAMS } from "@/lib/models/User";
 import ReviewBoard, { type ReviewItem, type Track } from "@/components/ReviewBoard";
+import ScoringGuideCallout from "@/components/ScoringGuideCallout";
 
 export default async function AdminReview() {
   let uid: string;
@@ -63,6 +64,7 @@ export default async function AdminReview() {
         Everyone scores applicants 1–10 (async). Members are one general pool; each field-team lead is its own track.
         Once scored, use the ranking to decide who moves to interviews — advance individually or set a cutoff with &ldquo;Advance top N.&rdquo;
       </p>
+      <div className="mt-6"><ScoringGuideCallout /></div>
       <div className="mt-6">
         {tracks.length === 0 ? (
           <p className="t-body text-muted">No submitted applications to review yet.</p>
