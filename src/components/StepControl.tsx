@@ -11,8 +11,46 @@ const HINTS: Partial<Record<RecruitingStep, string>> = {
 
 type Readiness = { undecidedReview: number; undecidedFinal: number; interviewMessageSet: boolean };
 
-export default function StepControl({ current, readiness }: { current: RecruitingStep; readiness: Readiness }) {
+type Schedule = { at: string; to: RecruitingStep } | null;
+
+const CENTRAL = "America/Chicago";
+const fmtCentral = (iso: string) =>
+  new Date(iso).toLocaleString("en-US", { timeZone: CENTRAL, weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZoneName: "short" });
+const untilText = (iso: string) => {
+  const ms = new Date(iso).getTime() - Date.now();
+  if (ms <= 0) return "due now — applies on the next page load";
+  const h = Math.floor(ms / 3.6e6), m = Math.round((ms % 3.6e6) / 6e4);
+  return `in ${h > 0 ? `${h}h ` : ""}${m}m`;
+};
+/** Next 2:40 AM in the browser's local time, as a datetime-local value. */
+const defaultLocalValue = () => {
+  const d = new Date(); d.setSeconds(0, 0); d.setHours(2, 40, 0, 0);
+  if (d.getTime() <= Date.now()) d.setDate(d.getDate() + 1);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+};
+
+export default function StepControl({ current, readiness, schedule = null }: { current: RecruitingStep; readiness: Readiness; schedule?: Schedule }) {
   const router = useRouter();
+  const [when, setWhen] = useState<string>(defaultLocalValue);
+  const [schedBusy, setSchedBusy] = useState(false);
+  const [schedMsg, setSchedMsg] = useState<string | null>(null);
+  const canSchedule = STEP_ORDER.indexOf(current) < STEP_ORDER.indexOf(RecruitingStep.REVIEWING);
+
+  const saveSchedule = async (at: string | null) => {
+    setSchedBusy(true); setSchedMsg(null);
+    try {
+      const res = await fetch("/api/admin/config/step-schedule", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ at: at ? new Date(at).toISOString() : null, to: RecruitingStep.REVIEWING }),
+      });
+      const body = await res.json();
+      if (!res.ok) { setSchedMsg(body.error || "Failed."); return; }
+      setSchedMsg(at ? "Scheduled" : "Cancelled");
+      router.refresh();
+      setTimeout(() => setSchedMsg(null), 2500);
+    } finally { setSchedBusy(false); }
+  };
   const [step, setStep] = useState<RecruitingStep>(current);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
@@ -88,6 +126,40 @@ export default function StepControl({ current, readiness }: { current: Recruitin
 
       {HINTS[step] && step !== current && (
         <p className="mt-3 text-[13px]" style={{ color: "var(--color-warn)" }}>{HINTS[step]}</p>
+      )}
+
+      {/* Timed auto-advance: Open → Reviewing at an exact time, no cron. */}
+      {(canSchedule || schedule) && (
+        <div className="mt-6 rounded-2xl p-5" style={{ background: "var(--color-surface-2)", border: "1px solid rgba(255,255,255,0.08)" }}>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-[12px] uppercase tracking-wider text-muted">Auto-close applications</p>
+            {schedule
+              ? <span className="badge badge-warn">Scheduled · {untilText(schedule.at)}</span>
+              : <span className="badge badge-muted">Not scheduled</span>}
+          </div>
+          {schedule ? (
+            <>
+              <p className="mt-3 text-[15px] font-semibold">
+                Switches to <span className="text-accent">{STEP_LABELS[schedule.to]}</span> at {fmtCentral(schedule.at)}
+              </p>
+              <p className="mt-1 text-[13px] text-muted">Applications lock and the review period begins at that exact moment. Applies on the first page load after the time, so it&apos;s accurate to the second.</p>
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                <button onClick={() => saveSchedule(null)} disabled={schedBusy} className="pill pill-ghost !px-4 !py-2 !text-[13px] disabled:opacity-50">{schedBusy ? "…" : "Cancel schedule"}</button>
+                {schedMsg && <span className="text-[13px]" style={{ color: schedMsg === "Scheduled" || schedMsg === "Cancelled" ? "var(--color-ok)" : "var(--color-danger)" }}>{schedMsg}</span>}
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="mt-2 text-[13px] text-muted">Pick when applications should close. The step flips to <span className="text-white">Reviewing</span> automatically at that time (your local time, Central).</p>
+              <div className="mt-3 flex flex-wrap items-center gap-3">
+                <input type="datetime-local" value={when} onChange={(e) => setWhen(e.target.value)}
+                  className="rounded-2xl px-4 py-2.5 text-[14px] text-white [color-scheme:dark]" style={{ background: "var(--color-surface)", border: "1px solid rgba(255,255,255,0.1)" }} />
+                <button onClick={() => saveSchedule(when)} disabled={schedBusy || !when} className="pill pill-blue !px-4 !py-2 !text-[13px] disabled:opacity-50">{schedBusy ? "Saving…" : "Schedule"}</button>
+                {schedMsg && <span className="text-[13px]" style={{ color: schedMsg === "Scheduled" ? "var(--color-ok)" : "var(--color-danger)" }}>{schedMsg}</span>}
+              </div>
+            </>
+          )}
+        </div>
       )}
 
       {/* Confirmation modal */}

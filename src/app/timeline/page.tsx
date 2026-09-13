@@ -18,7 +18,7 @@ const EVENTS: Event[] = [
   { date: "Sep 7", day: "Mon", title: "Info Session #2", time: "6:00 – 7:00 PM", location: "CAL 100", type: "info" },
   { date: "Sep 8", day: "Tue", title: "Coffee Chat #2", time: "5:00 – 6:30 PM", location: "Lucky Lab", type: "coffee" },
   { date: "Sep 10", day: "Thu", title: "Info Session #3", time: "7:00 – 8:00 PM", location: "Virtual", type: "info" },
-  { date: "Sep 12", day: "Sat", title: "Application Closes", time: "11:59 PM", location: "Online", type: "deadline" },
+  { date: "Sep 13", day: "Sun", title: "Application Closes", time: "2:40 AM", location: "Online", type: "deadline" },
 ];
 
 const UPCOMING = [

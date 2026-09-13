@@ -1,13 +1,56 @@
 import { adminDb } from "./admin";
-import { LEGACY_STEP, RecruitingStep } from "@/lib/models/Config";
+import { LEGACY_STEP, RecruitingStep, STEP_ORDER } from "@/lib/models/Config";
+import { recordAudit } from "./audit";
 
 /** The current global recruiting step (config/recruiting.currentStep). */
-export async function getRecruitingStep(): Promise<RecruitingStep> {
-  const doc = await adminDb.doc("config/recruiting").get();
-  const raw = doc.exists ? (doc.data()?.currentStep as string | undefined) : undefined;
+export interface StepSchedule { at: Date; to: RecruitingStep }
+
+function readSchedule(data: FirebaseFirestore.DocumentData | undefined): StepSchedule | null {
+  const at = data?.autoAdvanceAt;
+  const to = data?.autoAdvanceTo as RecruitingStep | undefined;
+  if (!at || !to || !Object.values(RecruitingStep).includes(to)) return null;
+  return { at: at.toDate ? at.toDate() : new Date(at), to };
+}
+
+function normalizeStep(raw: string | undefined): RecruitingStep {
   if (raw && raw in LEGACY_STEP) return LEGACY_STEP[raw];
   const step = raw as RecruitingStep | undefined;
   return step && Object.values(RecruitingStep).includes(step) ? step : RecruitingStep.OPEN;
+}
+
+/**
+ * The current global recruiting step (config/recruiting.currentStep).
+ * If an auto-advance is scheduled and its time has passed, the first read after
+ * that moment applies it (exact to the second, no cron needed) and logs it.
+ */
+export async function getRecruitingStep(): Promise<RecruitingStep> {
+  const doc = await adminDb.doc("config/recruiting").get();
+  const data = doc.exists ? doc.data() : undefined;
+  const current = normalizeStep(data?.currentStep as string | undefined);
+  const schedule = readSchedule(data);
+  if (schedule && Date.now() >= schedule.at.getTime()) {
+    const due = STEP_ORDER.indexOf(schedule.to) > STEP_ORDER.indexOf(current);
+    await adminDb.doc("config/recruiting").set(
+      { ...(due ? { currentStep: schedule.to, updatedAt: new Date(), updatedBy: "scheduled" } : {}), autoAdvanceAt: null, autoAdvanceTo: null },
+      { merge: true }
+    );
+    if (due) await recordAudit({ actorUid: "system", actorName: "Scheduled auto-advance", action: "step.set", detail: `${schedule.to} (scheduled for ${schedule.at.toISOString()})` });
+    return due ? schedule.to : current;
+  }
+  return current;
+}
+
+/** A pending auto-advance, if any (does not apply it). */
+export async function getStepSchedule(): Promise<StepSchedule | null> {
+  const doc = await adminDb.doc("config/recruiting").get();
+  return readSchedule(doc.exists ? doc.data() : undefined);
+}
+
+export async function setStepSchedule(schedule: StepSchedule | null, by: string): Promise<void> {
+  await adminDb.doc("config/recruiting").set(
+    { autoAdvanceAt: schedule?.at ?? null, autoAdvanceTo: schedule?.to ?? null, scheduleUpdatedAt: new Date(), scheduleUpdatedBy: by },
+    { merge: true }
+  );
 }
 
 export async function setRecruitingStep(step: RecruitingStep, by: string): Promise<void> {

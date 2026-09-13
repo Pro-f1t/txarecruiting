@@ -1,6 +1,6 @@
 import { requireStaff } from "@/lib/auth/guard";
 import { getAllApplications } from "@/lib/firebase/applications";
-import { getRecruitingStep, getInterviewMessage } from "@/lib/firebase/config";
+import { getRecruitingStep, getInterviewMessage, getStepSchedule } from "@/lib/firebase/config";
 import { ApplicationStatus } from "@/lib/models/Application";
 import { STEP_LABELS } from "@/lib/models/Config";
 import { UserRole } from "@/lib/models/User";
@@ -10,7 +10,7 @@ import InterviewMessageControl from "@/components/InterviewMessageControl";
 export default async function AdminOverview() {
   const { user } = await requireStaff();
   const isAdmin = user.role === UserRole.ADMIN;
-  const [apps, step, interviewMessage] = await Promise.all([getAllApplications(), getRecruitingStep(), getInterviewMessage()]);
+  const [apps, step, interviewMessage, schedule] = await Promise.all([getAllApplications(), getRecruitingStep(), getInterviewMessage(), getStepSchedule()]);
 
   const submitted = apps.filter((a) => a.status === ApplicationStatus.SUBMITTED);
   const drafts = apps.filter((a) => a.status === ApplicationStatus.IN_PROGRESS);
@@ -54,7 +54,7 @@ export default async function AdminOverview() {
       </div>
 
       {isAdmin ? (
-        <StepControl current={step} readiness={readiness} />
+        <StepControl current={step} readiness={readiness} schedule={schedule ? { at: schedule.at.toISOString(), to: schedule.to } : null} />
       ) : (
         <div className="card flex items-center justify-between gap-4 p-7">
           <div>

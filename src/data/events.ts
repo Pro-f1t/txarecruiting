@@ -20,7 +20,7 @@ export const EVENTS: RecruitingEvent[] = [
   { id: "info-2", type: "info_session", title: "Info Session #2", date: "Sep 7", day: "Mon", time: "6:00 – 7:00 PM", location: "CAL 100", startsAt: "2026-09-07T18:00:00-05:00" },
   { id: "coffee-2", type: "coffee_chat", title: "Coffee Chat #2", date: "Sep 8", day: "Tue", time: "5:00 – 6:30 PM", location: "Lucky Lab", startsAt: "2026-09-08T17:00:00-05:00" },
   { id: "info-3", type: "info_session", title: "Info Session #3", date: "Sep 10", day: "Thu", time: "7:00 – 8:00 PM", location: "Virtual", startsAt: "2026-09-10T19:00:00-05:00" },
-  { id: "close", type: "deadline", title: "Application Closes", date: "Sep 12", day: "Sat", time: "11:59 PM", location: "Online", startsAt: "2026-09-12T23:59:00-05:00" },
+  { id: "close", type: "deadline", title: "Application Closes", date: "Sep 13", day: "Sun", time: "2:40 AM", location: "Online", startsAt: "2026-09-13T02:40:00-05:00" },
 ];
 
 export const EVENT_TYPE_LABEL: Record<EventType, string> = {

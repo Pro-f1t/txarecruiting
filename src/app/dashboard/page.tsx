@@ -164,6 +164,14 @@ export default async function DashboardPage() {
 
   return (
     <section className="shell pt-28 pb-24">
+      {!closed && (
+        <div className="mb-7 flex justify-center">
+          <span className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-[14px] font-semibold text-white"
+            style={{ background: "#BF5700", boxShadow: "0 0 0 1px rgba(191,87,0,0.45), 0 8px 24px rgba(191,87,0,0.35)" }}>
+            Pushing the deadline to 2:40am - Hook &apos;em Horns 🤘
+          </span>
+        </div>
+      )}
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="t-eyebrow">Applicant dashboard</p>
