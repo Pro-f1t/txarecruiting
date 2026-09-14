@@ -36,7 +36,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     if (!Number.isFinite(score) || score < 1 || score > 10) {
       return NextResponse.json({ error: "Score must be 1–10." }, { status: 400 });
     }
-    // Comments are required — a bare number is not useful to the other reviewers.
+    // Comments are required - a bare number is not useful to the other reviewers.
     const comment = typeof body.comment === "string" ? body.comment.trim() : "";
     if (comment.length === 0) {
       return NextResponse.json({ error: "Add a comment explaining your score." }, { status: 400 });

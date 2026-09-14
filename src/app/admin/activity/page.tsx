@@ -5,7 +5,7 @@ export default async function AdminActivity() {
   return (
     <div>
       <h1 className="t-card-title">Activity</h1>
-      <p className="t-body mt-2 text-muted">Admin actions — decisions and step changes.</p>
+      <p className="t-body mt-2 text-muted">Admin actions - decisions and step changes.</p>
       <div className="mt-6 space-y-2">
         {entries.length === 0 && <p className="t-body text-muted">No activity yet.</p>}
         {entries.map((e) => (

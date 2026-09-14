@@ -77,5 +77,5 @@ for (const [name, member, lead, review, final, attended] of PEOPLE) {
   console.log("app", id, "-", name);
   i++;
 }
-console.log(`Done — ${PEOPLE.length} fake applications.`);
+console.log(`Done - ${PEOPLE.length} fake applications.`);
 process.exit(0);

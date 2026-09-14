@@ -13,7 +13,7 @@ export default function BackupCard({
   const [open, setOpen] = useState(initialArmedMs > 0); // auto-open if already armed
   const [qr, setQr] = useState("");
 
-  // Generate the QR only when revealed — keeps it out of the page source.
+  // Generate the QR only when revealed - keeps it out of the page source.
   useEffect(() => {
     if (!open || qr) return;
     QRCode.toDataURL(url, { margin: 1, width: 440, color: { dark: "#08050f", light: "#ffffff" } })

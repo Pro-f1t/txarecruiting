@@ -3,7 +3,7 @@ import { adminDb } from "./admin";
 
 const USERS = "users";
 
-/** Record that a user attended an event (idempotent — arrayUnion). */
+/** Record that a user attended an event (idempotent - arrayUnion). */
 export async function addAttendance(uid: string, eventId: string): Promise<void> {
   await adminDb.collection(USERS).doc(uid).set(
     { attendedEventIds: FieldValue.arrayUnion(eventId) },

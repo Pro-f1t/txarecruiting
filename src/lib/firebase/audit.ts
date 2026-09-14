@@ -9,7 +9,7 @@ export interface AuditEntry {
   at?: Date;
 }
 
-/** Record an admin action. Swallows its own errors — never fails the request. */
+/** Record an admin action. Swallows its own errors - never fails the request. */
 export async function recordAudit(entry: AuditEntry): Promise<void> {
   try {
     await adminDb.collection("audit_log").add({ ...entry, at: entry.at ?? new Date() });

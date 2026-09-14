@@ -17,7 +17,7 @@ export function Bars({ data }: { data: { label: string; value: number }[] }) {
   );
 }
 
-// Conversion bars — the advanced portion filled against the total, with a %.
+// Conversion bars - the advanced portion filled against the total, with a %.
 export function StageBars({ data }: { data: { label: string; advanced: number; total: number; pct: number }[] }) {
   const max = Math.max(1, ...data.map((d) => d.total));
   return (

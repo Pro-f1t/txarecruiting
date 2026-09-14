@@ -1,7 +1,7 @@
 export type QuestionType = "short" | "long";
 export interface Question { id: string; label: string; type: QuestionType; placeholder?: string }
 
-// Standard questions everyone answers. (Hardcoded for now — becomes admin-
+// Standard questions everyone answers. (Hardcoded for now - becomes admin-
 // configurable config later, following the LHR questions CMS pattern.)
 export const COMMON_QUESTIONS: Question[] = [
   { id: "major", label: "Major", type: "short", placeholder: "e.g. Finance, Computer Science" },

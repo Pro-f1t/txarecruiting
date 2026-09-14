@@ -11,7 +11,7 @@ type Event = {
   type: "info" | "coffee" | "deadline";
 };
 
-// September 2026 — from the recruitment graphic ("Updated with locations").
+// September 2026 - from the recruitment graphic ("Updated with locations").
 const EVENTS: Event[] = [
   { date: "Sep 1", day: "Tue", title: "Info Session #1", time: "7:00 – 8:00 PM", location: "PAI 2.48", type: "info" },
   { date: "Sep 2", day: "Wed", title: "Coffee Chat #1", time: "5:00 – 6:30 PM", location: "Gong Cha", type: "coffee" },
@@ -85,7 +85,7 @@ export default function TimelinePage() {
         </div>
       </div>
 
-      {/* Interview + decisions — dates announced later */}
+      {/* Interview + decisions - dates announced later */}
       <h2 className="h-display mt-16">After applications close</h2>
       <p className="t-body mt-3 max-w-[60ch] text-muted">Exact dates are announced later in the cycle.</p>
       <div className="mt-8 grid gap-4 sm:grid-cols-2">

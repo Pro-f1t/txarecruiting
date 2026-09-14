@@ -111,7 +111,7 @@ export default function UsersTable({ rows: initialRows, meUid, canEdit }: { rows
                   <button
                     onClick={() => setPending({ kind: "review", uid: r.uid, name: r.name, allow: !r.canReviewApplications })}
                     disabled={busy === r.uid}
-                    title={r.canReviewApplications ? "Can score and decide applications — click to revoke" : "Grant access to the Application review tab"}
+                    title={r.canReviewApplications ? "Can score and decide applications - click to revoke" : "Grant access to the Application review tab"}
                     className="flex items-center gap-2 rounded-full px-3 py-1.5 text-[12px] font-semibold transition-colors disabled:opacity-50"
                     style={r.canReviewApplications
                       ? { background: "color-mix(in srgb, var(--color-accent) 18%, transparent)", color: "var(--color-accent)", border: "1px solid color-mix(in srgb, var(--color-accent) 45%, transparent)" }

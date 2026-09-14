@@ -55,7 +55,7 @@ export default function LiveCheckin({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eventId]);
 
-  // Counter — slow poll (reads the whole users collection).
+  // Counter - slow poll (reads the whole users collection).
   useEffect(() => {
     let alive = true;
     const poll = async () => {

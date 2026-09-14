@@ -12,7 +12,7 @@ const syne = Syne({
 });
 
 export const metadata: Metadata = {
-  title: "Texas Accelerate — Apply",
+  title: "Texas Accelerate - Apply",
   description: "Apply to Texas Accelerate. Connect with real work at Austin startups, nonprofits, and campaigns.",
 };
 

@@ -28,7 +28,7 @@ export default async function AdminReview({ searchParams }: { searchParams: Prom
     byKey.set(k, cur);
   }
 
-  // Submission order (stable) — the board offers an opt-in sort by score.
+  // Submission order (stable) - the board offers an opt-in sort by score.
   const inOrder = (a: (typeof submitted)[number], b: (typeof submitted)[number]) => +(a.submittedAt ?? 0) - +(b.submittedAt ?? 0);
   const buildItems = (appsInTrack: typeof submitted, track: string): ReviewItem[] =>
     [...appsInTrack].sort(inOrder).map((a) => {
@@ -42,7 +42,7 @@ export default async function AdminReview({ searchParams }: { searchParams: Prom
     });
 
   // The signed-in reviewer's own general-member review scores, bucketed 1..10, for the
-  // "Your distribution" chart. Lead-track scores are excluded — the curve is for the GM pool.
+  // "Your distribution" chart. Lead-track scores are excluded - the curve is for the GM pool.
   const mineList = scores.filter((s) => s.reviewerUid === uid && s.track === "member");
   const mine = {
     counts: Array.from({ length: 10 }, (_, i) => mineList.filter((s) => s.score === i + 1).length),
@@ -62,7 +62,7 @@ export default async function AdminReview({ searchParams }: { searchParams: Prom
     const leadApps = submitted.filter((a) => a.leadTeams.includes(team));
     if (leadApps.length > 0) {
       const key = `lead:${team}`;
-      tracks.push({ key, label: `Lead — ${team}` });
+      tracks.push({ key, label: `Lead - ${team}` });
       itemsByTrack[key] = buildItems(leadApps, key);
     }
   }
@@ -72,7 +72,7 @@ export default async function AdminReview({ searchParams }: { searchParams: Prom
       <h1 className="t-card-title">Application review</h1>
       <p className="t-body mt-2 max-w-[70ch] text-muted">
         Everyone scores applicants 1–10 (async). Members are one general pool; each field-team lead is its own track.
-        Once scored, use the ranking to decide who moves to interviews — advance individually or set a cutoff with &ldquo;Advance top N.&rdquo;
+        Once scored, use the ranking to decide who moves to interviews - advance individually or set a cutoff with &ldquo;Advance top N.&rdquo;
       </p>
       <div className="mt-6"><ScoringGuideCallout mine={mine} /></div>
       <div className="mt-6">

@@ -5,7 +5,7 @@ export enum RecruitingStep {
   OPEN = "open",
   REVIEWING = "reviewing",
   // One step: interview invites are revealed to applicants AND interview signup
-  // opens. (Formerly two steps — "release_interviews" is mapped onto this on read.)
+  // opens. (Formerly two steps - "release_interviews" is mapped onto this on read.)
   INTERVIEWING = "interviewing",
   RELEASE_DECISIONS = "release_decisions",
 }
@@ -30,6 +30,6 @@ export const STEP_LABELS: Record<RecruitingStep, string> = {
   [RecruitingStep.PRE_OPEN]: "Pre-open",
   [RecruitingStep.OPEN]: "Applications open",
   [RecruitingStep.REVIEWING]: "Reviewing",
-  [RecruitingStep.INTERVIEWING]: "Interviewing — invites released",
+  [RecruitingStep.INTERVIEWING]: "Interviewing - invites released",
   [RecruitingStep.RELEASE_DECISIONS]: "Decisions released",
 };

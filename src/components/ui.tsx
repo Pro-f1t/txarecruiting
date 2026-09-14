@@ -1,5 +1,5 @@
 /**
- * Stand-in art for photography — on-brand gradient blocks. Copied from the
+ * Stand-in art for photography - on-brand gradient blocks. Copied from the
  * marketing site (Project02) so the field-team cards match one-to-one.
  */
 export function PlaceholderArt({

@@ -56,7 +56,7 @@ export default async function ApplyPage() {
         </div>
       ) : (
         <p className="t-body mt-4 max-w-[60ch] text-muted">
-          Pick the field team(s) you want to join — you can choose more than one — answer a few
+          Pick the field team(s) you want to join - you can choose more than one - answer a few
           questions, and optionally apply to be a field team lead too. You can edit your application
           any time before the deadline.
         </p>

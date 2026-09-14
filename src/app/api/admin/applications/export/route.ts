@@ -19,7 +19,7 @@ const EVENT_TITLE = new Map(EVENTS.map((e) => [e.id, e.title]));
 const iso = (d?: Date) => (d ? new Date(d).toISOString() : "");
 const round1 = (n: number | null) => (n == null ? "" : Math.round(n * 10) / 10);
 
-const trackLabel = (key: string) => (key === "member" ? "General member" : `Lead — ${key.slice("lead:".length)}`);
+const trackLabel = (key: string) => (key === "member" ? "General member" : `Lead - ${key.slice("lead:".length)}`);
 const tracksOf = (a: Application) => [...(a.memberTeams.length > 0 ? ["member"] : []), ...a.leadTeams.map((t) => `lead:${t}`)];
 const decisionLabel = (d?: string, stage: "review" | "final" = "review") =>
   d === "advanced" ? (stage === "review" ? "Interview" : "Accepted") : d === "rejected" ? "Rejected" : "Pending";

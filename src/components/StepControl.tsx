@@ -18,7 +18,7 @@ const fmtCentral = (iso: string) =>
   new Date(iso).toLocaleString("en-US", { timeZone: CENTRAL, weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZoneName: "short" });
 const untilText = (iso: string) => {
   const ms = new Date(iso).getTime() - Date.now();
-  if (ms <= 0) return "due now — applies on the next page load";
+  if (ms <= 0) return "due now - applies on the next page load";
   const h = Math.floor(ms / 3.6e6), m = Math.round((ms % 3.6e6) / 6e4);
   return `in ${h > 0 ? `${h}h ` : ""}${m}m`;
 };
@@ -81,11 +81,11 @@ export default function StepControl({ current, readiness, schedule = null }: { c
   // Failsafe checks relevant to the target step.
   const warnings: string[] = [];
   if (step === RecruitingStep.INTERVIEWING) {
-    if (readiness.undecidedReview > 0) warnings.push(`${readiness.undecidedReview} application-review decision${readiness.undecidedReview === 1 ? " is" : "s are"} still pending — those applicants have no Interview/Reject yet.`);
-    if (!readiness.interviewMessageSet) warnings.push("No interview scheduling message is set — applicants won't know how to book their interview.");
+    if (readiness.undecidedReview > 0) warnings.push(`${readiness.undecidedReview} application-review decision${readiness.undecidedReview === 1 ? " is" : "s are"} still pending - those applicants have no Interview/Reject yet.`);
+    if (!readiness.interviewMessageSet) warnings.push("No interview scheduling message is set - applicants won't know how to book their interview.");
   }
   if (step === RecruitingStep.RELEASE_DECISIONS && readiness.undecidedFinal > 0) {
-    warnings.push(`${readiness.undecidedFinal} interview decision${readiness.undecidedFinal === 1 ? " is" : "s are"} still pending — those interviewees have no Accept/Reject yet.`);
+    warnings.push(`${readiness.undecidedFinal} interview decision${readiness.undecidedFinal === 1 ? " is" : "s are"} still pending - those interviewees have no Accept/Reject yet.`);
   }
 
   return (
@@ -103,7 +103,7 @@ export default function StepControl({ current, readiness, schedule = null }: { c
         style={{ background: "color-mix(in srgb, var(--color-danger) 15%, transparent)", border: "1px solid var(--color-danger)" }}>
         <span className="mt-0.5 shrink-0 text-[16px]" style={{ color: "var(--color-danger)" }}>⚠</span>
         <p className="text-[13px] font-bold leading-relaxed" style={{ color: "var(--color-danger)" }}>
-          DO NOT TOUCH THIS unless you know exactly what you&apos;re doing. Changing the step instantly changes what every applicant sees — including revealing interview and final decisions. Set all decisions first.
+          DO NOT TOUCH THIS unless you know exactly what you&apos;re doing. Changing the step instantly changes what every applicant sees - including revealing interview and final decisions. Set all decisions first.
         </p>
       </div>
 

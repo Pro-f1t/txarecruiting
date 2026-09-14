@@ -1,5 +1,5 @@
 // Backfill formData.firstName / formData.lastName on existing applications from
-// the application's stored userName. Only fills where BOTH are missing — never
+// the application's stored userName. Only fills where BOTH are missing - never
 // overwrites a name the applicant already typed. Idempotent.
 //
 // Emulator:   FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 node scripts/backfill-names.mjs
@@ -11,7 +11,7 @@ import admin from "firebase-admin";
 const DRY = process.env.DRY_RUN === "1";
 // Passing a service-account key targets production. The Admin SDK honours
 // FIRESTORE_EMULATOR_HOST even with real credentials, and dotenv loads it from
-// .env — so strip it (and the auth host) to actually reach production.
+// .env - so strip it (and the auth host) to actually reach production.
 const forceProd = !!process.env.GOOGLE_APPLICATION_CREDENTIALS && process.env.USE_EMULATOR !== "1";
 if (forceProd) {
   delete process.env.FIRESTORE_EMULATOR_HOST;
@@ -40,7 +40,7 @@ function splitName(name) {
 }
 
 const snap = await db.collection("applications").get();
-console.log(`${usingEmulator ? "EMULATOR" : "PRODUCTION"}${DRY ? " (dry run)" : ""} — ${snap.size} applications\n`);
+console.log(`${usingEmulator ? "EMULATOR" : "PRODUCTION"}${DRY ? " (dry run)" : ""} - ${snap.size} applications\n`);
 
 let filled = 0, skipped = 0, noName = 0;
 for (const doc of snap.docs) {

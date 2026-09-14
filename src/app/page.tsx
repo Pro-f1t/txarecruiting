@@ -7,7 +7,7 @@ import ApplyBar from "@/components/ApplyBar";
 export default function Home() {
   return (
     <>
-      {/* Hero — the looping WebGL veil, one-to-one with the marketing site. */}
+      {/* Hero - the looping WebGL veil, one-to-one with the marketing site. */}
       <section className="relative isolate flex min-h-svh items-center overflow-hidden">
         <div className="pointer-events-none absolute inset-0 -z-10">
           <DarkVeil speed={2} />
@@ -22,7 +22,7 @@ export default function Home() {
           </h1>
           <p className="t-body mt-6 max-w-[58ch] text-muted">
             Applications for Texas Accelerate are now open. Attend an info session and a coffee
-            chat, then apply to the field teams that fit you — as a member, a lead, or both.
+            chat, then apply to the field teams that fit you - as a member, a lead, or both.
           </p>
           <div className="mt-10 flex flex-wrap gap-4">
             <Link href="/dashboard" className="pill pill-blue">Get started</Link>
@@ -37,7 +37,7 @@ export default function Home() {
         <div className="mt-8 grid gap-8 sm:grid-cols-3 lg:mt-14">
           {[
             { n: "01", t: "Attend", d: "Check in at one info session and one coffee chat to submit your application." },
-            { n: "02", t: "Apply", d: "Submit to any of the field teams — and apply to lead a team if you want to." },
+            { n: "02", t: "Apply", d: "Submit to any of the field teams - and apply to lead a team if you want to." },
             { n: "03", t: "Interview & decide", d: "Meet the team, then hear back on a single decision release date." },
           ].map((s) => (
             <div key={s.n} className="card p-7">
@@ -49,11 +49,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Field teams — scrollable cards, copied one-to-one from the marketing site. */}
+      {/* Field teams - scrollable cards, copied one-to-one from the marketing site. */}
       <section className="shell pt-16 lg:pt-24">
         <h2 className="h-display">Pick your field team</h2>
         <p className="t-body mt-4 text-white">
-          Six field teams span the work our partners need. Apply to any that fit — as a
+          Six field teams span the work our partners need. Apply to any that fit - as a
           member, a lead, or both.
         </p>
 

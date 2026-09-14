@@ -48,7 +48,7 @@ function LoginForm() {
       const staff = ["admin", "exec"].includes(body.role);
       const next = params.get("next");
       // Hard navigation (not router.push) so the just-set session cookie is sent
-      // with the request — a client nav can race the cookie and bounce a brand-new
+      // with the request - a client nav can race the cookie and bounce a brand-new
       // user back to sign-in until they refresh.
       window.location.assign(next || (staff ? "/admin" : "/dashboard"));
     },

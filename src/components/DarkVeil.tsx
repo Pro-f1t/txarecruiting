@@ -159,7 +159,7 @@ export default function DarkVeil({
     };
 
     // Only burn GPU/CPU while the veil is actually on screen and the tab is
-    // visible — the footer veil sits off-screen on long pages and in background
+    // visible - the footer veil sits off-screen on long pages and in background
     // tabs, where a continuous WebGL loop is pure waste.
     const active = () => onScreen && document.visibilityState === "visible";
     const play = () => { if (!frame && active()) loop(); };

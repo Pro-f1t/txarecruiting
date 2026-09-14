@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyToken, mintPass, PASS_COOKIE, PASS_TTL_SECONDS } from "@/lib/attendance/token";
 import { EVENTS } from "@/data/events";
 
-// Never cache — a frozen response would freeze the QR on a dead code.
+// Never cache - a frozen response would freeze the QR on a dead code.
 export const dynamic = "force-dynamic";
 
 // The token is spent HERE, at scan time, in the 10s freshness window. We set a

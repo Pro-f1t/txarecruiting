@@ -49,7 +49,7 @@ export default function BackupCheckinButton({ eventId, initialArmedMs }: { event
       </button>
       <p className="mt-1.5 text-[11px] text-muted">
         {armed
-          ? "The static QR above works now — break-glass only, it disarms itself."
+          ? "The static QR above works now - break-glass only, it disarms itself."
           : "The QR above only works while armed. Use the live display for normal check-in."}
       </p>
       {error && <p className="mt-1 text-[11px] text-danger">{error}</p>}

@@ -98,7 +98,7 @@ export async function clearDecisionsForTrack(appIds: string[], key: string, stag
 
 /**
  * Create or update the applicant's single application. Editable before the
- * deadline — submitting again overwrites the previous answers/selections.
+ * deadline - submitting again overwrites the previous answers/selections.
  */
 export async function upsertApplication(
   meta: { userId: string; userName?: string; userEmail?: string },
@@ -139,7 +139,7 @@ export async function upsertApplication(
  * without going back to the board. `interviewOnly` restricts to tracks advanced
  * from application review. `sort: "score"` mirrors the board's "Sort by score":
  * review stage by review average; interview stage by the overall (review +
- * interview) average — unscored last, ties keep submission order.
+ * interview) average - unscored last, ties keep submission order.
  */
 export async function getTrackNeighbors(
   appId: string, track: string, interviewOnly = false, sort: "submitted" | "score" = "submitted",

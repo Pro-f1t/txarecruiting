@@ -119,7 +119,7 @@ function InterviewSchedule({ message, interviewCount }: { message: string | null
           style={{ background: "color-mix(in srgb, var(--color-danger) 15%, transparent)", border: "1px solid var(--color-danger)" }}>
           <span className="mt-0.5 shrink-0 text-[16px]" style={{ color: "var(--color-danger)" }}>⚠</span>
           <p className="text-[13px] font-bold leading-relaxed" style={{ color: "var(--color-danger)" }}>
-            You&apos;re interviewing for {interviewCount} roles — please book ONLY ONE interview.
+            You&apos;re interviewing for {interviewCount} roles - please book ONLY ONE interview.
           </p>
         </div>
       )}

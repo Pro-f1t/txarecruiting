@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 const PLACEHOLDER = `Example:
-Book ONE 20-minute slot in either room — whichever has a time that works for you.
+Book ONE 20-minute slot in either room - whichever has a time that works for you.
 Room A (PAI 3.14): https://calendly.com/…
 Room B (GDC 2.210): https://calendly.com/…
 Bring a copy of your resume. Questions? texas.accelerate@gmail.com`;
@@ -37,11 +37,11 @@ export default function InterviewMessageControl({ current, live = false }: { cur
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="t-eyebrow">Interview scheduling message</p>
         <span className={`badge ${!current ? "badge-warn" : live ? "badge-ok" : "badge-muted"}`}>
-          {!current ? "Not set" : live ? "Live — applicants can see this" : "Saved — hidden until the step is Interviewing"}
+          {!current ? "Not set" : live ? "Live - applicants can see this" : "Saved - hidden until the step is Interviewing"}
         </span>
       </div>
       <p className="t-body mt-2 text-muted">
-        Shown only to applicants advanced to interview, and only once the recruiting step is <span className="text-white">Interviewing</span> — nothing is visible during Reviewing. Appears exactly as written here. Put the room links, times, and any instructions in it — URLs become clickable automatically. Applicants interviewing for more than one role are also told to book only one slot.
+        Shown only to applicants advanced to interview, and only once the recruiting step is <span className="text-white">Interviewing</span> - nothing is visible during Reviewing. Appears exactly as written here. Put the room links, times, and any instructions in it - URLs become clickable automatically. Applicants interviewing for more than one role are also told to book only one slot.
       </p>
       <textarea rows={7} value={message} onChange={(e) => setMessage(e.target.value)} placeholder={PLACEHOLDER}
         className="mt-4 w-full resize-y rounded-2xl px-4 py-3 text-[14px] leading-relaxed text-white outline-none"

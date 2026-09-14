@@ -40,7 +40,7 @@ export function buildApplicationCards(app: Application, step: RecruitingStep): A
   const fd = app.finalDecisions ?? {};
 
   // The general member application is ONE application (one decision), whatever
-  // field teams were selected — those are interests, keyed under a single "member".
+  // field teams were selected - those are interests, keyed under a single "member".
   if (app.memberTeams.length > 0) {
     const rev = [rd["member"]].filter(Boolean) as StageDecision[];
     const fin = [fd["member"]].filter(Boolean) as StageDecision[];
@@ -49,7 +49,7 @@ export function buildApplicationCards(app: Application, step: RecruitingStep): A
   for (const t of app.leadTeams) {
     const rev = [rd[`lead:${t}`]].filter(Boolean) as StageDecision[];
     const fin = [fd[`lead:${t}`]].filter(Boolean) as StageDecision[];
-    cards.push({ key: `lead:${t}`, kind: "lead", title: `Field team lead — ${t}`, teams: [t], status: statusFromDecisions(rev, fin, step) });
+    cards.push({ key: `lead:${t}`, kind: "lead", title: `Field team lead - ${t}`, teams: [t], status: statusFromDecisions(rev, fin, step) });
   }
   return cards;
 }
@@ -57,7 +57,7 @@ export function buildApplicationCards(app: Application, step: RecruitingStep): A
 export const STATUS_PRESENTATION: Record<VisibleStatus, { badge: string; badgeClass: string; message: string }> = {
   submitted: { badge: "Submitted", badgeClass: "badge-ok", message: "Received and under review. Interview invites are announced here." },
   interview: { badge: "Interview", badgeClass: "badge-warn", message: "You've advanced to the interview stage 🎉 Book your slot above before the deadline." },
-  accepted: { badge: "Accepted", badgeClass: "badge-ok", message: "Congratulations — you're in! 🎉 Welcome to Texas Accelerate." },
+  accepted: { badge: "Accepted", badgeClass: "badge-ok-solid", message: "Congratulations - you're in! 🎉 Welcome to Texas Accelerate." },
   rejected_application: { badge: "Not selected", badgeClass: "badge-danger", message: "Thank you for applying. We had a much larger applicant pool than we expected for a new organization, and we genuinely appreciate the time you spent on your application. We really hope you reapply in the spring - we'd love to see you again." },
   rejected_interview: { badge: "Not selected", badgeClass: "badge-danger", message: "Thank you for interviewing with us. We had a much larger applicant pool than we expected for a new organization, and we genuinely appreciate the time you spent on your application. We really hope you reapply in the spring - we'd love to see you again." },
 };

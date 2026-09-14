@@ -36,7 +36,7 @@ export default async function ReviewDetail({
 
   const nav = await getTrackNeighbors(id, track, false, sort);
 
-  const trackLabel = track === "member" ? "General member application" : `Field team lead — ${track.slice("lead:".length)}`;
+  const trackLabel = track === "member" ? "General member application" : `Field team lead - ${track.slice("lead:".length)}`;
 
   const scores = await getScoresForAppTrack(id, track, "review");
   const mine = scores.find((s) => s.reviewerUid === uid);

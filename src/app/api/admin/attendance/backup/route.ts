@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 const VALID = new Set(EVENTS.filter((e) => e.type !== "deadline").map((e) => e.id));
 
 // Break-glass Tier 2: arm a static check-in QR for one event (auto-expires 15
-// min). Deliberately not always-on — a permanently valid QR defeats rotation.
+// min). Deliberately not always-on - a permanently valid QR defeats rotation.
 export async function POST(request: Request) {
   try {
     const { uid, user } = await requireStaff();

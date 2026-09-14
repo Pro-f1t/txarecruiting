@@ -46,7 +46,7 @@ export default async function DashboardPage() {
   const cards = application ? buildApplicationCards(application, step) : [];
   const isDraft = application?.status === "in_progress";
 
-  // Once review begins the applications (status, interview link) are what matters — show them first.
+  // Once review begins the applications (status, interview link) are what matters - show them first.
   const attendanceSection = (
     <>
         {/* Attendance requirement */}
@@ -134,7 +134,7 @@ export default async function DashboardPage() {
 
   const applicationsSection = (
     <>
-        {/* Applications — one card per application (general member + each field-team lead) */}
+        {/* Applications - one card per application (general member + each field-team lead) */}
         <div className={`${closed ? "mt-10" : "mt-8"} flex items-center justify-between gap-4`}>
           <p className="t-eyebrow">Your applications</p>
         </div>
@@ -143,14 +143,14 @@ export default async function DashboardPage() {
           <section className="card mt-4 p-7">
             <span className="badge badge-muted">Not started</span>
             <p className="t-body mt-4 text-muted">
-              You haven&apos;t started your application yet. Apply to any of the six field teams — as a
+              You haven&apos;t started your application yet. Apply to any of the six field teams - as a
               member, a lead, or both.
             </p>
             <Link href="/apply" className="pill pill-blue mt-6">Start an application</Link>
           </section>
         ) : isDraft ? (
           <section className="card mt-4 p-7">
-            <span className="badge badge-warn">Draft — not submitted</span>
+            <span className="badge badge-warn">Draft - not submitted</span>
             <p className="t-body mt-4 text-muted">
               {closed ? "Applications closed before this draft was submitted, so it was not considered." : "Your progress is saved. Finish and submit before the deadline to be considered."}
             </p>

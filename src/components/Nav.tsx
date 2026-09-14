@@ -64,7 +64,7 @@ export default function Nav() {
     } else {
       setMe(null);
     }
-    // Once per load — role/name are stable within a session (sign-in/out and
+    // Once per load - role/name are stable within a session (sign-in/out and
     // promotion both cause a full reload), so don't re-fetch on every nav.
   }, []);
 
@@ -77,7 +77,7 @@ export default function Nav() {
     return () => document.removeEventListener("mousedown", onDown);
   }, [menuOpen]);
 
-  // The live check-in display is a full-screen projected surface — no nav.
+  // The live check-in display is a full-screen projected surface - no nav.
   if (pathname.startsWith("/live")) return null;
 
   const signedIn = !!role;

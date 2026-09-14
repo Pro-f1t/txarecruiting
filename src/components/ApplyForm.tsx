@@ -77,7 +77,7 @@ export default function ApplyForm({
       const code = e && typeof e === "object" && "code" in e ? String((e as { code?: string }).code) : "";
       let msg = e instanceof Error ? e.message : "Upload failed. Please try again.";
       if (code === "storage/unauthorized") msg = "Upload was blocked by permissions. Make sure you're signed in, then try again.";
-      else if (code === "storage/retry-limit-exceeded" || code === "storage/canceled") msg = "Upload didn't finish — check your connection and try again.";
+      else if (code === "storage/retry-limit-exceeded" || code === "storage/canceled") msg = "Upload didn't finish - check your connection and try again.";
       else if (code && code !== "storage/unauthenticated") msg = `Upload failed (${code}). Please try again.`;
       setError(msg);
     } finally {
@@ -138,7 +138,7 @@ export default function ApplyForm({
     }
   };
 
-  // Save progress — no completeness checks, no confirmation modal.
+  // Save progress - no completeness checks, no confirmation modal.
   const saveDraft = async () => {
     setError(null);
     setSavedMsg(null);
@@ -242,7 +242,7 @@ export default function ApplyForm({
           <span>
             <span className="block text-[15px] font-semibold">I also want to apply to be a Field Team Lead</span>
             <span className="mt-1 block text-[13px] text-muted">
-              This is additive to your member application. You can be rejected for the lead role and still be accepted as a member — the two don&apos;t directly influence each other.
+              This is additive to your member application. You can be rejected for the lead role and still be accepted as a member - the two don&apos;t directly influence each other.
             </span>
           </span>
         </label>
@@ -280,14 +280,14 @@ export default function ApplyForm({
         </div>
       )}
 
-      {/* Separator — the general member application begins here */}
+      {/* Separator - the general member application begins here */}
       <div className="flex items-center gap-4 pt-2">
         <span className="h-px flex-1" style={{ background: "rgba(255,255,255,0.12)" }} />
         <span className="t-eyebrow whitespace-nowrap">General member application</span>
         <span className="h-px flex-1" style={{ background: "rgba(255,255,255,0.12)" }} />
       </div>
 
-      {/* Resume — its own box with preview */}
+      {/* Resume - its own box with preview */}
       <div className="card p-7">
         <p className="t-eyebrow">Resume <Req /></p>
         <p className="t-body mt-2 text-muted">Upload your resume as a PDF. Required.</p>
@@ -324,12 +324,12 @@ export default function ApplyForm({
       <div className="card space-y-6 p-7">
         <Long label="Why are you interested in joining Texas Accelerate?" value={f.whyJoin ?? ""} onChange={(v) => set("whyJoin", v)} required max={150} count={whyWords} />
         <Long
-          label="Explain a project that you've worked on. This doesn't have to be professional — tell us about something that makes you tick, from arts and crafts to public speaking to volunteering. We want to see passion, so be clear about what you actually did and what it means to you."
+          label="Explain a project that you've worked on. This doesn't have to be professional - tell us about something that makes you tick, from arts and crafts to public speaking to volunteering. We want to see passion, so be clear about what you actually did and what it means to you."
           value={f.project ?? ""} onChange={(v) => set("project", v)} required max={150} count={projWords}
         />
         <div className="block">
           <span className="mb-2 block text-[14px] font-medium">
-            Upload an image that appeals to you — share something about yourself, your interests, or what is meaningful to you. This is open-ended — have fun! <span className="text-muted">(PNG or JPEG)</span> <Req />
+            Upload an image that appeals to you - share something about yourself, your interests, or what is meaningful to you. This is open-ended - have fun! <span className="text-muted">(PNG or JPEG)</span> <Req />
           </span>
           <div className="flex items-center gap-3 rounded-2xl px-4 py-3" style={fieldStyle}>
             <label className="cursor-pointer shrink-0">
@@ -360,7 +360,7 @@ export default function ApplyForm({
           {savingDraft ? "Saving…" : "Save progress"}
         </button>
         {savedMsg && <span className="text-[13px]" style={{ color: "var(--color-ok)" }}>{savedMsg} ✓</span>}
-        {!editable && <span className="text-[13px] text-muted">Applications are closed — the deadline has passed.</span>}
+        {!editable && <span className="text-[13px] text-muted">Applications are closed - the deadline has passed.</span>}
         {editable && !infoAttended && <span className="text-[13px] text-muted">You haven&apos;t checked in at an info session yet.</span>}
       </div>
 

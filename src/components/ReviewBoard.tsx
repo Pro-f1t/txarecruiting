@@ -25,7 +25,7 @@ const overall = (a?: number | null, b?: number | null): number | null => {
 function Stat({ label, val, highlight }: { label: string; val: number | null | undefined; highlight?: boolean }) {
   return (
     <div className="text-center">
-      <p className="text-[18px] font-bold leading-none" style={highlight ? { color: "var(--color-accent)" } : undefined}>{val != null ? val.toFixed(1) : "—"}</p>
+      <p className="text-[18px] font-bold leading-none" style={highlight ? { color: "var(--color-accent)" } : undefined}>{val != null ? val.toFixed(1) : "-"}</p>
       <p className="mt-1 text-[10px] uppercase tracking-wider text-muted">{label}</p>
     </div>
   );
@@ -44,10 +44,31 @@ export default function ReviewBoard({
   const [busy, setBusy] = useState<string | null>(null);
   const [sortByScore, setSortByScore] = useState(initialSortByScore);
   const [confirmClear, setConfirmClear] = useState(false);
+  const [copied, setCopied] = useState<string | null>(null);
+
 
   const rawItems = itemsByTrack[track] ?? [];
   const scoreOf = (it: ReviewItem) => (dualScore ? overall(it.priorAvg, it.avg) : it.avg) ?? -1;
   const items = sortByScore ? [...rawItems].sort((a, b) => scoreOf(b) - scoreOf(a)) : rawItems;
+
+  // Mass-email lists for the track currently selected: GM tab → GM decisions,
+  // a lead tab → that lead track's decisions.
+  const uniq = (arr: string[]) => [...new Set(arr.filter(Boolean))];
+  const emailLists = {
+    advanced: uniq(rawItems.filter((i) => i.decision === "advanced").map((i) => i.email)),
+    rejected: uniq(rawItems.filter((i) => i.decision === "rejected").map((i) => i.email)),
+  };
+
+  const copyEmails = async (key: string, emails: string[]) => {
+    if (emails.length === 0) return;
+    try {
+      await navigator.clipboard.writeText(emails.join(", "));
+      setCopied(key);
+      setTimeout(() => setCopied((k) => (k === key ? null : k)), 2500);
+    } catch {
+      window.prompt("Copy these emails:", emails.join(", "));
+    }
+  };
 
   const setDecision = async (appId: string, decision: string) => {
     setBusy(`dec:${appId}`);
@@ -149,6 +170,23 @@ export default function ReviewBoard({
         </div>
       )}
 
+      {/* Mass-email helpers for the selected track */}
+      <div className="mt-4 flex flex-wrap items-center gap-2 rounded-2xl px-4 py-3" style={{ background: "var(--color-surface-2)" }}>
+        <span className="mr-1 text-[12px] uppercase tracking-wider text-muted">Copy emails</span>
+        {([
+          { key: "advanced", label: `All ${advanceLabel.toLowerCase()}s`, list: emailLists.advanced },
+          { key: "rejected", label: "All rejections", list: emailLists.rejected },
+        ] as const).map((b) => (
+          <button key={b.key} onClick={() => copyEmails(b.key, b.list)} disabled={b.list.length === 0}
+            title={b.list.length === 0 ? "No one in this list yet" : `Copy ${b.list.length} email${b.list.length === 1 ? "" : "s"} to the clipboard`}
+            className="rounded-full px-3.5 py-1.5 text-[12.5px] font-semibold transition-colors disabled:opacity-40"
+            style={copied === b.key ? { background: "var(--color-ok)", color: "#08050f" } : { background: "rgba(255,255,255,0.06)", color: "var(--color-muted)", border: "1px solid rgba(255,255,255,0.12)" }}>
+            {copied === b.key ? `Copied ${b.list.length} ✓` : `${b.label} (${b.list.length})`}
+          </button>
+        ))}
+        <span className="text-[12px] text-muted">{trackLabel} · paste into BCC</span>
+      </div>
+
       <div className="mt-4 space-y-2">
         {items.length === 0 && <p className="t-body text-muted">No applicants in this track.</p>}
         {items.map((it, i) => (
@@ -176,7 +214,7 @@ export default function ReviewBoard({
               </div>
             ) : (
               <div className="text-center">
-                <p className="text-[20px] font-bold leading-none">{it.avg != null ? it.avg.toFixed(1) : "—"}</p>
+                <p className="text-[20px] font-bold leading-none">{it.avg != null ? it.avg.toFixed(1) : "-"}</p>
                 <p className="mt-1 text-[11px] text-muted">{it.count} score{it.count === 1 ? "" : "s"}</p>
               </div>
             )}

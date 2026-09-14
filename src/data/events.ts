@@ -8,12 +8,12 @@ export interface RecruitingEvent {
   day: string;      // "Tue"
   time: string;     // display time
   location: string;
-  startsAt: string; // ISO, Central time — used to derive upcoming/past
+  startsAt: string; // ISO, Central time - used to derive upcoming/past
 }
 
 export const SEASON = "Fall 2026";
 
-// September 2026 — from the recruitment graphic.
+// September 2026 - from the recruitment graphic.
 export const EVENTS: RecruitingEvent[] = [
   { id: "info-1", type: "info_session", title: "Info Session #1", date: "Sep 1", day: "Tue", time: "7:00 – 8:00 PM", location: "PAI 2.48", startsAt: "2026-09-01T19:00:00-05:00" },
   { id: "coffee-1", type: "coffee_chat", title: "Coffee Chat #1", date: "Sep 2", day: "Wed", time: "5:00 – 6:30 PM", location: "Gong Cha", startsAt: "2026-09-02T17:00:00-05:00" },
@@ -31,7 +31,7 @@ export const EVENT_TYPE_LABEL: Record<EventType, string> = {
 
 // The check-in event live right now: its window runs from 30 min before start
 // to 90 min after. Deadlines never count. Used by /live/now so the display
-// picks the session itself — impossible to check people into the wrong one.
+// picks the session itself - impossible to check people into the wrong one.
 const LIVE_LEAD_MS = 30 * 60 * 1000;
 const LIVE_TAIL_MS = 90 * 60 * 1000;
 

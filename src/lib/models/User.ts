@@ -2,7 +2,7 @@
 // can grade interviews, but cannot touch the recruiting step or manage roles.
 // Execs cannot grade applications unless an admin grants them the
 // `canReviewApplications` permission on the Users tab. APPLICANT applies. (The member/lead
-// distinction lives on the APPLICATION, not here — see ApplicantRole.)
+// distinction lives on the APPLICATION, not here - see ApplicantRole.)
 export enum UserRole {
   ADMIN = "admin",
   EXEC = "exec",

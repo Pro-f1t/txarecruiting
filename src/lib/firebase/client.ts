@@ -8,12 +8,12 @@ import { EMULATOR_PROJECT_ID } from "./emulator";
 
 const useEmulator = process.env.NEXT_PUBLIC_FIREBASE_EMULATOR === "1";
 
-// PUBLIC browser config. Safe to commit — it is not a secret. Replace these
+// PUBLIC browser config. Safe to commit - it is not a secret. Replace these
 // placeholders with the real values from the TXA Firebase project's web app
 // (Firebase console → Project settings → Your apps → Web app config) before
 // deploying to production. In emulator mode the projectId is overridden below,
 // so the placeholders are fine for all local development.
-// Serve Firebase Auth from our OWN origin (proxied — see next.config.ts) so the
+// Serve Firebase Auth from our OWN origin (proxied - see next.config.ts) so the
 // login handler is first-party and Safari/iPad storage partitioning can't break
 // it. On the client that's the current host; the string fallback only applies
 // during SSR, where no auth call runs.

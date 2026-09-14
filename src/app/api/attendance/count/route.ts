@@ -5,7 +5,7 @@ import { EVENTS } from "@/data/events";
 
 export const dynamic = "force-dynamic";
 
-// Live check-in count for the display. Polled slowly (20–30s) — it reads the
+// Live check-in count for the display. Polled slowly (20–30s) - it reads the
 // whole users collection, so a 5s cadence would be ~200k reads over an event.
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);

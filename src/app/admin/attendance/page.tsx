@@ -36,7 +36,7 @@ export default async function AdminAttendance() {
         <div>
           <h1 className="t-card-title">Attendance</h1>
           <p className="t-body mt-2 text-muted">
-            Open the live display at an event — it shows a QR that rotates every few seconds so a shared screenshot can&apos;t check people in.
+            Open the live display at an event - it shows a QR that rotates every few seconds so a shared screenshot can&apos;t check people in.
           </p>
         </div>
         <div className="text-right">
@@ -53,7 +53,7 @@ export default async function AdminAttendance() {
             <p className="t-body mt-1 text-muted">The rotating QR. Project it or prop up a phone. &quot;Live now&quot; auto-picks the current session; pick a specific event to test any time.</p>
           </div>
           {liveUrl ? (
-            <a href={liveUrl} target="_blank" rel="noreferrer" className="pill pill-blue shrink-0">Open — live now ↗</a>
+            <a href={liveUrl} target="_blank" rel="noreferrer" className="pill pill-blue shrink-0">Open - live now ↗</a>
           ) : (
             <span className="text-[12px] text-warn">Set DISPLAY_KEY + CHECKIN_SECRET in the environment to enable.</span>
           )}
@@ -79,7 +79,7 @@ export default async function AdminAttendance() {
 
       {/* Backup QR codes (armed on demand) */}
       <p className="t-eyebrow mt-10">Backup codes</p>
-      <p className="t-body mt-1 text-muted">If the live display can&apos;t run, arm one of these static QRs — it works for 15 minutes, then disarms itself.</p>
+      <p className="t-body mt-1 text-muted">If the live display can&apos;t run, arm one of these static QRs - it works for 15 minutes, then disarms itself.</p>
       <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {cards.map(({ e, url }) => (
           <BackupCard

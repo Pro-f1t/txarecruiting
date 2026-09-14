@@ -1,9 +1,9 @@
 const FAQS = [
   { q: "Why can't I log in?", a: "Most often it's because you opened the link inside another app's browser (like Instagram or TikTok), where Google sign-in is blocked. Tap the ••• menu and choose \"Open in Safari\" or \"Open in Chrome,\" then sign in with your Google account." },
-  { q: "Who can apply?", a: "Any UT Austin student — sign in with your Google account to get started." },
-  { q: "Do I have to attend events first?", a: "Yes — attend at least one info session (required); a coffee chat is highly encouraged too. Then check in from your dashboard to submit your application." },
+  { q: "Who can apply?", a: "Any UT Austin student - sign in with your Google account to get started." },
+  { q: "Do I have to attend events first?", a: "Yes - attend at least one info session (required); a coffee chat is highly encouraged too. Then check in from your dashboard to submit your application." },
   { q: "Can I apply to more than one field team?", a: "Yes. You can apply to any of the six field teams." },
-  { q: "What's the difference between member and lead?", a: "You can apply as a member and/or as a lead of a team. Lead applicants still answer the normal questions, and are reviewed separately — a lead decision never affects your member application." },
+  { q: "What's the difference between member and lead?", a: "You can apply as a member and/or as a lead of a team. Lead applicants still answer the normal questions, and are reviewed separately - a lead decision never affects your member application." },
   { q: "When will I hear back?", a: "Everyone hears back on a single decision release date after interviews. See the Timeline page." },
 ];
 

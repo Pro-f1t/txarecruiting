@@ -51,7 +51,7 @@ export default async function AdminInterviews({ searchParams }: { searchParams: 
     const leadInterview = submitted.filter((a) => a.leadTeams.includes(team) && a.reviewDecisions?.[`lead:${team}`] === "advanced");
     if (leadInterview.length > 0) {
       const key = `lead:${team}`;
-      tracks.push({ key, label: `Lead — ${team}` });
+      tracks.push({ key, label: `Lead - ${team}` });
       itemsByTrack[key] = buildItems(leadInterview, key);
     }
   }
@@ -65,7 +65,7 @@ export default async function AdminInterviews({ searchParams }: { searchParams: 
 
       <div className="mt-6">
         {tracks.length === 0 ? (
-          <p className="t-body text-muted">No one has been advanced to interviews yet — mark applicants &ldquo;Interview&rdquo; in Application review first.</p>
+          <p className="t-body text-muted">No one has been advanced to interviews yet - mark applicants &ldquo;Interview&rdquo; in Application review first.</p>
         ) : (
           <ReviewBoard tracks={tracks} itemsByTrack={itemsByTrack} decisionStage="final" detailBase="/admin/interviews" advanceLabel="Accept" dualScore initialSortByScore={sort === "score"} initialTrack={initialTrack} />
         )}

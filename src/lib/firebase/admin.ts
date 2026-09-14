@@ -8,7 +8,7 @@ if (!firebase.apps.length) {
   const authEmulator = process.env.FIREBASE_AUTH_EMULATOR_HOST;
 
   if (firestoreEmulator || authEmulator) {
-    // Both emulator variables must be set together — with only one, the other
+    // Both emulator variables must be set together - with only one, the other
     // service silently talks to production.
     if (!firestoreEmulator || !authEmulator) {
       throw new Error(
@@ -16,7 +16,7 @@ if (!firebase.apps.length) {
       );
     }
     if (process.env.VERCEL) {
-      throw new Error("Firebase emulator variables are set in a Vercel environment — remove them");
+      throw new Error("Firebase emulator variables are set in a Vercel environment - remove them");
     }
     console.warn(`Firebase admin using emulators (firestore ${firestoreEmulator}, auth ${authEmulator})`);
     firebase.initializeApp({ projectId: EMULATOR_PROJECT_ID });

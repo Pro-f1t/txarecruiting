@@ -49,7 +49,7 @@ export async function POST(request: Request) {
     const { uid, user } = await requireUser();
 
     if (await applicationsClosed()) {
-      return NextResponse.json({ error: "Applications are closed — the review period has begun." }, { status: 403 });
+      return NextResponse.json({ error: "Applications are closed - the review period has begun." }, { status: 403 });
     }
 
     let body: { memberTeams?: unknown; leadTeams?: unknown; formData?: unknown; draft?: unknown };

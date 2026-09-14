@@ -122,7 +122,7 @@ export default function ConversationsManager({ rows: initial }: { rows: ConvRow[
                   {r.others.map((o, i) => (
                     <p key={i} className="text-[13px]">
                       <span className="font-medium">{o.staffName}</span>
-                      {o.comment && <span className="text-muted"> — {o.comment}</span>}
+                      {o.comment && <span className="text-muted"> - {o.comment}</span>}
                     </p>
                   ))}
                 </div>

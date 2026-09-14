@@ -59,7 +59,7 @@ export async function setRecruitingStep(step: RecruitingStep, by: string): Promi
 
 /**
  * The interview scheduling message shown to every interview-stage applicant
- * (config/interviews.message). Free text — admins put the room links, times,
+ * (config/interviews.message). Free text - admins put the room links, times,
  * and instructions in here. Empty/missing = "not available yet" placeholder.
  */
 export async function getInterviewMessage(): Promise<string | null> {

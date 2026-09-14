@@ -27,7 +27,7 @@ export default function ScoringGuideCallout({ compact = false, mine }: { compact
   if (compact) {
     return (
       <p className="mt-2 text-[12.5px] leading-relaxed" style={{ color: "var(--color-warn)" }}>
-        Use the full 1–10 range — your scores across all applicants should form a bell curve centred around 5–6, not cluster at 7–9.
+        Use the full 1–10 range - your scores across all applicants should form a bell curve centred around 5–6, not cluster at 7–9.
       </p>
     );
   }
@@ -35,7 +35,7 @@ export default function ScoringGuideCallout({ compact = false, mine }: { compact
     <div className="card p-6" style={{ border: "1px solid color-mix(in srgb, var(--color-warn) 55%, transparent)", background: "color-mix(in srgb, var(--color-warn) 7%, var(--color-surface))" }}>
       <div className="flex flex-wrap items-start justify-between gap-6">
         <div className="min-w-[260px] flex-1">
-          <p className="t-eyebrow" style={{ color: "var(--color-warn)" }}>How to score — read before grading</p>
+          <p className="t-eyebrow" style={{ color: "var(--color-warn)" }}>How to score - read before grading</p>
           <p className="mt-2 text-[16px] font-semibold">Your general-member scores should form a bell curve across 1–10.</p>
           <ul className="mt-3 space-y-1.5 text-[14px] text-muted">
             <li>• <span className="text-white">Use the whole range.</span> A few applicants deserve a 1–3, most belong in 4–7, and only the standouts get 9–10.</li>
@@ -60,7 +60,7 @@ export default function ScoringGuideCallout({ compact = false, mine }: { compact
                 <Histogram values={mine.counts} highlightIdx={(i) => mine.counts[i] === Math.max(...mine.counts)} tone="var(--color-accent)" />
               ) : (
                 <div className="mt-2 flex h-[88px] w-[276px] items-center justify-center rounded-2xl text-[13px] text-muted" style={{ background: "rgba(255,255,255,0.04)" }}>
-                  No scores yet — your bars appear here as you grade.
+                  No scores yet - your bars appear here as you grade.
                 </div>
               )}
             </div>

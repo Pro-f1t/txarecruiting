@@ -1,7 +1,7 @@
 import { Team } from "./User";
 
 // A person applies per (team, role). Applying as LEAD also spawns a MEMBER
-// application for the same team (Option B — parallel, independent review).
+// application for the same team (Option B - parallel, independent review).
 export enum ApplicantRole {
   MEMBER = "member",
   LEAD = "lead",
@@ -16,11 +16,11 @@ export enum ApplicationStatus {
 }
 
 // Staff stamp these internally the moment they decide; revealed to the
-// applicant only at the matching release step. Accept/reject only — no waitlist.
+// applicant only at the matching release step. Accept/reject only - no waitlist.
 export type StageDecision = "pending" | "advanced" | "rejected";
 
 export interface LeadAnswers {
-  leadExperience?: string;                 // prior leadership — single, across all teams
+  leadExperience?: string;                 // prior leadership - single, across all teams
   leadSkills?: Record<string, string>;     // relevant skills, one answer per team they want to lead (keyed by team name)
   workSample?: string;                     // optional link to a work sample
 }

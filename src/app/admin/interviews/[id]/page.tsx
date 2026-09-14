@@ -35,7 +35,7 @@ export default async function InterviewDetail({
 
   const nav = await getTrackNeighbors(id, track, true, sort);
 
-  const trackLabel = track === "member" ? "General member application" : `Field team lead — ${track.slice("lead:".length)}`;
+  const trackLabel = track === "member" ? "General member application" : `Field team lead - ${track.slice("lead:".length)}`;
 
   const [scores, reviewScores] = await Promise.all([
     getScoresForAppTrack(id, track, "interview"),

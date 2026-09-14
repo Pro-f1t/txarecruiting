@@ -1,6 +1,6 @@
 import { adminDb } from "./admin";
 
-// A staff member (admin/exec) marking that they talked to an applicant — for
+// A staff member (admin/exec) marking that they talked to an applicant - for
 // coffee-chat / info-session networking. One doc per (applicant, staff), so
 // several execs can each log a conversation with the same person.
 export interface Conversation {
