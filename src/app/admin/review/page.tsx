@@ -6,6 +6,7 @@ import { ApplicationStatus } from "@/lib/models/Application";
 import { TEAMS } from "@/lib/models/User";
 import ReviewBoard, { type ReviewItem, type Track } from "@/components/ReviewBoard";
 import ScoringGuideCallout from "@/components/ScoringGuideCallout";
+import { applicationReviewLocked } from "@/lib/applicationsOpen";
 
 export default async function AdminReview({ searchParams }: { searchParams: Promise<{ sort?: string; track?: string }> }) {
   const { sort, track: initialTrack } = await searchParams;
@@ -15,7 +16,7 @@ export default async function AdminReview({ searchParams }: { searchParams: Prom
   } catch (e) {
     redirect(guardErrorStatus(e) === 403 ? "/admin" : "/auth/login");
   }
-  const [apps, scores] = await Promise.all([getAllApplications(), getScores("review")]);
+  const [apps, scores, locked] = await Promise.all([getAllApplications(), getScores("review"), applicationReviewLocked()]);
   const submitted = apps.filter((a) => a.status === ApplicationStatus.SUBMITTED);
 
   // scores indexed by `${appId}::${track}`
@@ -74,12 +75,21 @@ export default async function AdminReview({ searchParams }: { searchParams: Prom
         Everyone scores applicants 1–10 (async). Members are one general pool; each field-team lead is its own track.
         Once scored, use the ranking to decide who moves to interviews - advance individually or set a cutoff with &ldquo;Advance top N.&rdquo;
       </p>
+      {locked && (
+        <div className="mt-6 flex items-start gap-3 rounded-2xl p-4" style={{ background: "color-mix(in srgb, var(--color-danger) 12%, transparent)", border: "1px solid var(--color-danger)" }}>
+          <span className="text-[16px]" style={{ color: "var(--color-danger)" }}>🔒</span>
+          <div>
+            <p className="text-[14px] font-bold" style={{ color: "var(--color-danger)" }}>Application review is locked</p>
+            <p className="mt-0.5 text-[13px] text-muted">Interview invites have been released, so scores and Interview/Reject decisions are read-only - changing them now would change what applicants already see. An admin can move the recruiting step back to Reviewing from Overview to unlock.</p>
+          </div>
+        </div>
+      )}
       <div className="mt-6"><ScoringGuideCallout mine={mine} /></div>
       <div className="mt-6">
         {tracks.length === 0 ? (
           <p className="t-body text-muted">No submitted applications to review yet.</p>
         ) : (
-          <ReviewBoard tracks={tracks} itemsByTrack={itemsByTrack} initialSortByScore={sort === "score"} initialTrack={initialTrack} />
+          <ReviewBoard tracks={tracks} itemsByTrack={itemsByTrack} initialSortByScore={sort === "score"} initialTrack={initialTrack} locked={locked} />
         )}
       </div>
     </div>

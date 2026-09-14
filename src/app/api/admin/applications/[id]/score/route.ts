@@ -4,6 +4,7 @@ import { canReviewApplications } from "@/lib/models/User";
 import { getApplication } from "@/lib/firebase/applications";
 import { upsertScore, clearScore } from "@/lib/firebase/scores";
 import { recordAudit } from "@/lib/firebase/audit";
+import { applicationReviewLocked } from "@/lib/applicationsOpen";
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -17,6 +18,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     // Execs may grade interviews; grading applications needs the admin-granted permission.
     if (stage === "review" && !canReviewApplications(user)) {
       return NextResponse.json({ error: "You don't have Application review access." }, { status: 403 });
+    }
+    if (stage === "review" && (await applicationReviewLocked())) {
+      return NextResponse.json({ error: "Application review is locked - interview invites have been released." }, { status: 409 });
     }
     if (typeof body.track !== "string" || !body.track) return NextResponse.json({ error: "Missing track." }, { status: 400 });
 

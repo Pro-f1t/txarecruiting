@@ -3,6 +3,7 @@ import { requireStaff, guardErrorStatus } from "@/lib/auth/guard";
 import { canReviewApplications } from "@/lib/models/User";
 import { getApplication, setDecision } from "@/lib/firebase/applications";
 import { recordAudit } from "@/lib/firebase/audit";
+import { applicationReviewLocked } from "@/lib/applicationsOpen";
 import { StageDecision } from "@/lib/models/Application";
 
 const STAGES = ["review", "final"] as const;
@@ -21,6 +22,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     // Review-stage decisions need Application review access (admins, or execs an admin granted it).
     if (stage === "review" && !canReviewApplications(user)) {
       return NextResponse.json({ error: "You don't have Application review access." }, { status: 403 });
+    }
+    if (stage === "review" && (await applicationReviewLocked())) {
+      return NextResponse.json({ error: "Application review is locked - interview invites have been released." }, { status: 409 });
     }
     if (!DECISIONS.includes(decision as StageDecision)) return NextResponse.json({ error: "Bad decision." }, { status: 400 });
     if (typeof key !== "string" || !key) return NextResponse.json({ error: "Missing key." }, { status: 400 });

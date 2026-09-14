@@ -15,3 +15,12 @@ export async function applicationsClosed(): Promise<boolean> {
   if (pastDeadline()) return true;
   return isAtOrPast(await getRecruitingStep(), RecruitingStep.REVIEWING);
 }
+
+/**
+ * Application review (review-stage scores + Interview/Reject decisions) locks
+ * the moment interview invites are released - changing them afterwards would
+ * change what applicants already see. Interview review is unaffected.
+ */
+export async function applicationReviewLocked(): Promise<boolean> {
+  return isAtOrPast(await getRecruitingStep(), RecruitingStep.INTERVIEWING);
+}

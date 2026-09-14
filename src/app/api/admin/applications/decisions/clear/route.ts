@@ -4,6 +4,7 @@ import { canReviewApplications } from "@/lib/models/User";
 import { getAllApplications, clearDecisionsForTrack } from "@/lib/firebase/applications";
 import { recordAudit } from "@/lib/firebase/audit";
 import { ApplicationStatus } from "@/lib/models/Application";
+import { applicationReviewLocked } from "@/lib/applicationsOpen";
 
 // Bulk-reset every decision in one track (e.g. "member", "lead:Software, AI & Technology")
 // at one stage back to "pending". Same permission rules as a single decision.
@@ -19,6 +20,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "You don't have Application review access." }, { status: 403 });
     }
     if (typeof key !== "string" || !key) return NextResponse.json({ error: "Missing key." }, { status: 400 });
+    if (stage === "review" && (await applicationReviewLocked())) {
+      return NextResponse.json({ error: "Application review is locked - interview invites have been released." }, { status: 409 });
+    }
 
     const apps = await getAllApplications();
     const field = stage === "review" ? "reviewDecisions" : "finalDecisions";

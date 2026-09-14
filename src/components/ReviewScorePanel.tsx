@@ -7,10 +7,12 @@ import ScoringGuideCallout from "@/components/ScoringGuideCallout";
 type Other = { reviewerName?: string; score: number; comment?: string };
 
 export default function ReviewScorePanel({
-  appId, track, stage = "review", myScore, myComment, others, avg, priorAvg,
+  appId, track, stage = "review", myScore, myComment, others, avg, priorAvg, locked = false,
 }: {
   appId: string; track: string; stage?: string;
   myScore: number | null; myComment: string; others: Other[]; avg: number | null; priorAvg?: number | null;
+  /** Read-only: scoring is closed for this stage. */
+  locked?: boolean;
 }) {
   const router = useRouter();
   const [score, setScore] = useState<number | null>(myScore);
@@ -71,13 +73,18 @@ export default function ReviewScorePanel({
         </div>
       )}
 
-      {stage === "review" && <ScoringGuideCallout compact />}
+      {locked && (
+        <div className="mt-4 rounded-2xl p-3.5 text-[13px]" style={{ background: "color-mix(in srgb, var(--color-danger) 12%, transparent)", border: "1px solid var(--color-danger)", color: "var(--color-danger)" }}>
+          🔒 Scoring is locked - interview invites have been released. Your score and comment are shown for reference.
+        </div>
+      )}
+      {stage === "review" && !locked && <ScoringGuideCallout compact />}
 
       {/* 1–10 scale */}
       <div className="mt-4 flex flex-wrap gap-2">
         {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
-          <button key={n} onClick={() => setScore(n)}
-            className="h-10 w-10 rounded-xl text-[15px] font-bold transition-colors"
+          <button key={n} onClick={() => !locked && setScore(n)} disabled={locked}
+            className="h-10 w-10 rounded-xl text-[15px] font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-60"
             style={score === n ? { background: "var(--color-accent)", color: "var(--color-ink)" } : { background: "var(--color-surface-2)", color: "#fff" }}>
             {n}
           </button>
@@ -86,13 +93,13 @@ export default function ReviewScorePanel({
 
       <label className="mt-5 block">
         <span className="mb-2 block text-[13px] text-muted">Comment <span className="text-danger">*</span></span>
-        <textarea rows={7} value={comment} onChange={(e) => setComment(e.target.value)} placeholder="What stood out (good or bad), specific examples from their answers, and any reservations. Other reviewers will read this."
+        <textarea rows={7} value={comment} onChange={(e) => setComment(e.target.value)} disabled={locked} placeholder="What stood out (good or bad), specific examples from their answers, and any reservations. Other reviewers will read this."
           className="w-full resize-y rounded-2xl px-4 py-3 text-[14px] leading-relaxed text-white outline-none" style={{ background: "var(--color-surface-2)", border: "1px solid rgba(255,255,255,0.1)", minHeight: 168 }} />
       </label>
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
-        <button onClick={save} disabled={busy || score == null || comment.trim().length === 0} title={comment.trim().length === 0 ? "A comment is required" : undefined} className="pill pill-blue disabled:opacity-50">{busy ? "Saving…" : myScore != null ? "Update score" : "Save score"}</button>
-        {myScore != null && <button onClick={clear} disabled={busy} className="pill pill-ghost">Clear my score</button>}
+        <button onClick={save} disabled={locked || busy || score == null || comment.trim().length === 0} title={comment.trim().length === 0 ? "A comment is required" : undefined} className="pill pill-blue disabled:opacity-50">{busy ? "Saving…" : myScore != null ? "Update score" : "Save score"}</button>
+        {myScore != null && !locked && <button onClick={clear} disabled={busy} className="pill pill-ghost">Clear my score</button>}
         {msg && <span className="text-[13px]" style={{ color: msg === "Saved" || msg === "Cleared" ? "var(--color-ok)" : "var(--color-danger)" }}>{msg}</span>}
       </div>
 

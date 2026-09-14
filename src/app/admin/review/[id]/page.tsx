@@ -8,6 +8,7 @@ import { getScoresForAppTrack } from "@/lib/firebase/scores";
 import ApplicationAnswers from "@/components/ApplicationAnswers";
 import ReviewScorePanel from "@/components/ReviewScorePanel";
 import ReviewNav from "@/components/ReviewNav";
+import { applicationReviewLocked } from "@/lib/applicationsOpen";
 
 export default async function ReviewDetail({
   params, searchParams,
@@ -34,7 +35,7 @@ export default async function ReviewDetail({
   const track = rawTrack && validTracks.includes(rawTrack) ? rawTrack : validTracks[0];
   if (!track) notFound();
 
-  const nav = await getTrackNeighbors(id, track, false, sort);
+  const [nav, locked] = await Promise.all([getTrackNeighbors(id, track, false, sort), applicationReviewLocked()]);
 
   const trackLabel = track === "member" ? "General member application" : `Field team lead - ${track.slice("lead:".length)}`;
 
@@ -63,7 +64,7 @@ export default async function ReviewDetail({
       <div className="mt-6 grid gap-8 lg:grid-cols-[1.3fr_1fr] lg:items-start">
         <ApplicationAnswers app={app} attendedEventIds={applicant?.attendedEventIds ?? []} conversations={conversations} />
         <div className="lg:sticky lg:top-24">
-          <ReviewScorePanel appId={id} track={track} myScore={mine?.score ?? null} myComment={mine?.comment ?? ""} others={others} avg={avg} />
+          <ReviewScorePanel appId={id} track={track} myScore={mine?.score ?? null} myComment={mine?.comment ?? ""} others={others} avg={avg} locked={locked} />
         </div>
       </div>
     </div>

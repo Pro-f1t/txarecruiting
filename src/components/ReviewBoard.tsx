@@ -32,11 +32,13 @@ function Stat({ label, val, highlight }: { label: string; val: number | null | u
 }
 
 export default function ReviewBoard({
-  tracks, itemsByTrack, decisionStage = "review", detailBase = "/admin/review", advanceLabel = "Interview", dualScore = false, initialSortByScore = false, initialTrack,
+  tracks, itemsByTrack, decisionStage = "review", detailBase = "/admin/review", advanceLabel = "Interview", dualScore = false, initialSortByScore = false, initialTrack, locked = false,
 }: {
   tracks: Track[]; itemsByTrack: Record<string, ReviewItem[]>;
   decisionStage?: "review" | "final"; detailBase?: string; advanceLabel?: string; dualScore?: boolean;
   initialSortByScore?: boolean; initialTrack?: string;
+  /** Read-only: decisions can't be changed (e.g. application review after invites are released). */
+  locked?: boolean;
 }) {
   const router = useRouter();
   const [track, setTrack] = useState<string>(initialTrack && tracks.some((t) => t.key === initialTrack) ? initialTrack : (tracks[0]?.key ?? ""));
@@ -137,7 +139,7 @@ export default function ReviewBoard({
             style={sortByScore ? { background: "var(--color-accent)", color: "var(--color-ink)" } : { background: "var(--color-surface-2)", color: "var(--color-muted)" }}>
             {sortByScore ? "Sorted by score ✓" : "Sort by score"}
           </button>
-          <span className="text-[13px] text-muted">Advance top</span>
+          {!locked && <><span className="text-[13px] text-muted">Advance top</span>
           <input type="number" min={0} max={items.length} value={topN || ""} onChange={(e) => setTopN(Number(e.target.value))}
             className="w-16 rounded-xl px-3 py-1.5 text-[14px] text-white" style={{ background: "var(--color-surface-2)", border: "1px solid rgba(255,255,255,0.1)" }} />
           <button onClick={advanceTopN} disabled={busy === "topN" || !topN} className="pill pill-blue !px-4 !py-1.5 !text-[13px] disabled:opacity-50">
@@ -148,7 +150,8 @@ export default function ReviewBoard({
             className="rounded-full px-4 py-1.5 text-[13px] font-semibold transition-colors disabled:opacity-40"
             style={{ background: "rgba(255,255,255,0.06)", color: "var(--color-muted)", border: "1px solid rgba(255,255,255,0.12)" }}>
             {busy === "clearAll" ? "Clearing…" : "Clear all decisions"}
-          </button>
+          </button></>}
+          {locked && <span className="badge badge-danger">🔒 Locked</span>}
         </div>
       </div>
 
@@ -222,17 +225,17 @@ export default function ReviewBoard({
             <Link href={`${detailBase}/${it.appId}?track=${encodeURIComponent(track)}${sortByScore ? "&sort=score" : ""}`} className="pill pill-ghost !px-4 !py-1.5 !text-[13px]">Review</Link>
 
             <div className="flex items-center gap-2">
-              <button onClick={() => setDecision(it.appId, "advanced")} disabled={busy === `dec:${it.appId}`}
+              <button onClick={() => setDecision(it.appId, "advanced")} disabled={locked || busy === `dec:${it.appId}`}
                 className="rounded-full px-4 py-1.5 text-[13px] font-semibold disabled:opacity-50"
                 style={it.decision === "advanced" ? { background: "var(--color-ok)", color: "#08050f" } : { background: "rgba(255,255,255,0.06)", color: "var(--color-muted)" }}>
                 {advanceLabel}
               </button>
-              <button onClick={() => setDecision(it.appId, "rejected")} disabled={busy === `dec:${it.appId}`}
+              <button onClick={() => setDecision(it.appId, "rejected")} disabled={locked || busy === `dec:${it.appId}`}
                 className="rounded-full px-4 py-1.5 text-[13px] font-semibold disabled:opacity-50"
                 style={it.decision === "rejected" ? { background: "var(--color-danger)", color: "#08050f" } : { background: "rgba(255,255,255,0.06)", color: "var(--color-muted)" }}>
                 Reject
               </button>
-              {(it.decision === "advanced" || it.decision === "rejected") && (
+              {!locked && (it.decision === "advanced" || it.decision === "rejected") && (
                 <button onClick={() => setDecision(it.appId, "pending")} disabled={busy === `dec:${it.appId}`}
                   className="rounded-full px-3 py-1.5 text-[13px] text-muted transition-colors hover:text-white disabled:opacity-50">
                   Clear
