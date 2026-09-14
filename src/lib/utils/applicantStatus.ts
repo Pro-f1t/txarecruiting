@@ -56,10 +56,10 @@ export function buildApplicationCards(app: Application, step: RecruitingStep): A
 
 export const STATUS_PRESENTATION: Record<VisibleStatus, { badge: string; badgeClass: string; message: string }> = {
   submitted: { badge: "Submitted", badgeClass: "badge-ok", message: "Received and under review. Interview invites are announced here." },
-  interview: { badge: "Interview", badgeClass: "badge-warn", message: "You've advanced to the interview stage 🎉 Watch your email for details." },
+  interview: { badge: "Interview", badgeClass: "badge-warn", message: "You've advanced to the interview stage 🎉 Book your slot above before the deadline." },
   accepted: { badge: "Accepted", badgeClass: "badge-ok", message: "Congratulations — you're in! 🎉 Welcome to Texas Accelerate." },
-  rejected_application: { badge: "Not selected", badgeClass: "badge-danger", message: "Not selected at the application stage. Thank you for applying — we hope you apply again." },
-  rejected_interview: { badge: "Not selected", badgeClass: "badge-danger", message: "Not selected after interviews. Thank you for applying — we hope you apply again." },
+  rejected_application: { badge: "Not selected", badgeClass: "badge-danger", message: "Thank you for applying. We had a much larger applicant pool than we expected for a new organization, and we genuinely appreciate the time you spent on your application. We really hope you reapply in the spring - we'd love to see you again." },
+  rejected_interview: { badge: "Not selected", badgeClass: "badge-danger", message: "Thank you for interviewing with us. We had a much larger applicant pool than we expected for a new organization, and we genuinely appreciate the time you spent on your application. We really hope you reapply in the spring - we'd love to see you again." },
 };
 
 export const STAGES = ["Applied", "Interview", "Decision"] as const;

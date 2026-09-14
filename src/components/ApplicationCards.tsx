@@ -94,11 +94,26 @@ function RichText({ text }: { text: string }) {
   );
 }
 
+// Interview booking deadline shown on the scheduling card. Update each cycle.
+const INTERVIEW_BOOKING_DEADLINE = "11:59 PM, Monday Sep 14";
+
 /** Shown once, above the cards, when any track is at the interview stage. */
 function InterviewSchedule({ message, interviewCount }: { message: string | null; interviewCount: number }) {
   return (
-    <section className="card p-7" style={{ border: "1px solid color-mix(in srgb, var(--color-accent) 45%, transparent)" }}>
-      <p className="t-eyebrow">Schedule your interview</p>
+    <section className="card p-7" style={{ border: "2px solid var(--color-warn)", boxShadow: "0 0 0 4px color-mix(in srgb, var(--color-warn) 18%, transparent)" }}>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-[18px] font-bold" style={{ background: "var(--color-warn)", color: "#08050f" }}>!</span>
+          <div>
+            <p className="t-eyebrow" style={{ color: "var(--color-warn)" }}>Action required</p>
+            <p className="text-[20px] font-semibold leading-tight">Schedule your interview</p>
+          </div>
+        </div>
+        <span className="badge badge-warn !text-[12px]">Book by {INTERVIEW_BOOKING_DEADLINE}</span>
+      </div>
+      <p className="mt-4 text-[15px] font-semibold" style={{ color: "var(--color-warn)" }}>
+        You must book your interview slot by {INTERVIEW_BOOKING_DEADLINE}.
+      </p>
       {interviewCount > 1 && (
         <div className="mt-4 flex items-start gap-2.5 rounded-2xl p-4"
           style={{ background: "color-mix(in srgb, var(--color-danger) 15%, transparent)", border: "1px solid var(--color-danger)" }}>
