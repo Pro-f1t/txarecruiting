@@ -40,8 +40,9 @@ export default async function AdminReview() {
       };
     });
 
-  // The signed-in reviewer's own review-stage scores, bucketed 1..10, for the "Your distribution" chart.
-  const mineList = scores.filter((s) => s.reviewerUid === uid);
+  // The signed-in reviewer's own general-member review scores, bucketed 1..10, for the
+  // "Your distribution" chart. Lead-track scores are excluded — the curve is for the GM pool.
+  const mineList = scores.filter((s) => s.reviewerUid === uid && s.track === "member");
   const mine = {
     counts: Array.from({ length: 10 }, (_, i) => mineList.filter((s) => s.score === i + 1).length),
     total: mineList.length,

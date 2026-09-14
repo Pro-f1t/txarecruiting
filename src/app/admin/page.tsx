@@ -2,7 +2,7 @@ import { requireStaff } from "@/lib/auth/guard";
 import { getAllApplications } from "@/lib/firebase/applications";
 import { getRecruitingStep, getInterviewMessage, getStepSchedule } from "@/lib/firebase/config";
 import { ApplicationStatus } from "@/lib/models/Application";
-import { STEP_LABELS } from "@/lib/models/Config";
+import { STEP_LABELS, RecruitingStep, isAtOrPast } from "@/lib/models/Config";
 import { UserRole } from "@/lib/models/User";
 import StepControl from "@/components/StepControl";
 import InterviewMessageControl from "@/components/InterviewMessageControl";
@@ -65,7 +65,7 @@ export default async function AdminOverview() {
         </div>
       )}
 
-      <InterviewMessageControl current={interviewMessage} />
+      <InterviewMessageControl current={interviewMessage} live={isAtOrPast(step, RecruitingStep.INTERVIEWING)} />
     </div>
   );
 }

@@ -36,7 +36,7 @@ export default function ScoringGuideCallout({ compact = false, mine }: { compact
       <div className="flex flex-wrap items-start justify-between gap-6">
         <div className="min-w-[260px] flex-1">
           <p className="t-eyebrow" style={{ color: "var(--color-warn)" }}>How to score — read before grading</p>
-          <p className="mt-2 text-[16px] font-semibold">Your scores should form a bell curve across 1–10.</p>
+          <p className="mt-2 text-[16px] font-semibold">Your general-member scores should form a bell curve across 1–10.</p>
           <ul className="mt-3 space-y-1.5 text-[14px] text-muted">
             <li>• <span className="text-white">Use the whole range.</span> A few applicants deserve a 1–3, most belong in 4–7, and only the standouts get 9–10.</li>
             <li>• <span className="text-white">5–6 is average</span>, not a bad score. If everything you give is a 7, 8, or 9, your scores carry no information.</li>
@@ -53,7 +53,7 @@ export default function ScoringGuideCallout({ compact = false, mine }: { compact
           {mine && (
             <div aria-label="Your current score distribution">
               <p className="text-[11px] uppercase tracking-wider text-muted">
-                Your distribution
+                Your distribution <span className="normal-case tracking-normal">(general member only)</span>
                 {mine.total > 0 && <span className="ml-2 normal-case tracking-normal text-white">{mine.total} score{mine.total === 1 ? "" : "s"} · avg {mine.mean!.toFixed(1)}</span>}
               </p>
               {mine.total > 0 ? (
