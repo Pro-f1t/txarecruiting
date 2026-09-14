@@ -9,6 +9,10 @@ export interface TeamStage { team: string; total: number; advanced: number; pct:
 export interface CohortStats {
   total: number;                 // distinct applicants in the cohort
   member: { total: number; advanced: number; pct: number };
+  // Field-team distribution of the cohort: general members advanced on the
+  // member track (counted once per team they're interested in) + leads
+  // advanced for that specific team.
+  teams: TeamDemand[];
   byTeam: TeamStage[];           // lead conversion per field team
   majors: Named[];
 }
@@ -49,9 +53,16 @@ function cohort(submitted: Application[], stage: "review" | "final"): CohortStat
     return { team, total, advanced, pct: total > 0 ? Math.round((advanced / total) * 100) : 0 };
   }).filter((t) => t.total > 0).sort((a, b) => b.advanced - a.advanced);
 
+  const teams: TeamDemand[] = TEAMS.map((team) => {
+    const member = memberAdvanced.filter((a) => a.memberTeams.includes(team)).length;
+    const lead = submitted.filter((a) => a.leadTeams.includes(team) && decMap(a)[`lead:${team}`] === "advanced").length;
+    return { team: team as string, member, lead, total: member + lead };
+  }).filter((t) => t.total > 0).sort((a, b) => b.total - a.total);
+
   return {
     total: inCohort.length,
     member: { total: memberSubmitted.length, advanced: memberAdvanced.length, pct: memberSubmitted.length > 0 ? Math.round((memberAdvanced.length / memberSubmitted.length) * 100) : 0 },
+    teams,
     byTeam,
     majors: majorsOf(inCohort),
   };

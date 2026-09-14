@@ -2,6 +2,7 @@ import { adminDb } from "./admin";
 import { Application, ApplicationStatus, ApplicationFormData, StageDecision } from "@/lib/models/Application";
 import { Team } from "@/lib/models/User";
 import { FieldValue, FieldPath } from "firebase-admin/firestore";
+import { getScores } from "./scores";
 
 const COL = "applications";
 
@@ -134,16 +135,40 @@ export async function upsertApplication(
 }
 
 /**
- * The applicants in one track, in review-board order (submission time), so a
- * reviewer can step Prev/Next without going back to the board.
- * `interviewOnly` restricts to tracks advanced from application review.
+ * The applicants in one track in board order, so a reviewer can step Prev/Next
+ * without going back to the board. `interviewOnly` restricts to tracks advanced
+ * from application review. `sort: "score"` mirrors the board's "Sort by score":
+ * review stage by review average; interview stage by the overall (review +
+ * interview) average — unscored last, ties keep submission order.
  */
-export async function getTrackNeighbors(appId: string, track: string, interviewOnly = false): Promise<{ prevId: string | null; nextId: string | null; index: number; total: number; prevName?: string; nextName?: string }> {
-  const apps = (await getAllApplications())
+export async function getTrackNeighbors(
+  appId: string, track: string, interviewOnly = false, sort: "submitted" | "score" = "submitted",
+): Promise<{ prevId: string | null; nextId: string | null; index: number; total: number; prevName?: string; nextName?: string }> {
+  let apps = (await getAllApplications())
     .filter((a) => a.status === ApplicationStatus.SUBMITTED)
     .filter((a) => (track === "member" ? a.memberTeams.length > 0 : (a.leadTeams as string[]).includes(track.slice("lead:".length))))
     .filter((a) => !interviewOnly || a.reviewDecisions?.[track] === "advanced")
     .sort((a, b) => +(a.submittedAt ?? 0) - +(b.submittedAt ?? 0));
+
+  if (sort === "score") {
+    const avgOf = (list: { appId: string; track: string; score: number }[], id: string): number | null => {
+      const mine = list.filter((s) => s.appId === id && s.track === track);
+      return mine.length ? mine.reduce((sum, s) => sum + s.score, 0) / mine.length : null;
+    };
+    const review = await getScores("review");
+    const interview = interviewOnly ? await getScores("interview") : [];
+    const key = (id: string): number => {
+      const r = avgOf(review, id);
+      if (!interviewOnly) return r ?? -1;
+      const i = avgOf(interview, id);
+      const both = [r, i].filter((v): v is number => v != null);
+      return both.length ? both.reduce((s, v) => s + v, 0) / both.length : -1;
+    };
+    const ranked = apps.map((a) => ({ a, k: key(a.id) }));
+    ranked.sort((x, y) => y.k - x.k); // stable: ties keep submission order
+    apps = ranked.map((r) => r.a);
+  }
+
   const index = apps.findIndex((a) => a.id === appId);
   const prev = index > 0 ? apps[index - 1] : null;
   const next = index >= 0 && index < apps.length - 1 ? apps[index + 1] : null;

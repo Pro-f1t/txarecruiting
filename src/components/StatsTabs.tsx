@@ -37,6 +37,14 @@ function CohortView({ c, verb, label }: { c: CohortStats; verb: string; label: s
         { k: `${c.member.advanced}/${c.member.total}`, v: "Member pool" },
         { k: c.byTeam.reduce((s, t) => s + t.advanced, 0), v: `Lead ${label} across teams` },
       ]} />
+      <Card title={`Field team distribution — ${verb}`}>
+        <p className="mb-4 text-[13px] text-muted">
+          General members {verb} are counted under every field team they listed, so one person can appear in more than one bar. Leads count only for the team they were {label} for.
+        </p>
+        {c.teams.length > 0
+          ? <StackedBars data={c.teams.map((t) => ({ label: t.team, member: t.member, lead: t.lead }))} />
+          : <p className="t-body text-muted">No one {verb} yet.</p>}
+      </Card>
       <Card title={`${label[0].toUpperCase() + label.slice(1)} by field team (lead)`}>
         <StageBars data={c.byTeam.map((t) => ({ label: t.team, advanced: t.advanced, total: t.total, pct: t.pct }))} />
       </Card>

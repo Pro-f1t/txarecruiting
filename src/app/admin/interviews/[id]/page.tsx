@@ -13,11 +13,12 @@ export default async function InterviewDetail({
   params, searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ track?: string }>;
+  searchParams: Promise<{ track?: string; sort?: string }>;
 }) {
   const { uid } = await requireStaff();
   const { id } = await params;
-  const { track: rawTrack } = await searchParams;
+  const { track: rawTrack, sort: rawSort } = await searchParams;
+  const sort = rawSort === "score" ? "score" : "submitted";
 
   const app = await getApplication(id);
   const applicant = await getUser(app?.userId ?? id);
@@ -32,7 +33,7 @@ export default async function InterviewDetail({
   const track = rawTrack && interviewTracks.includes(rawTrack) ? rawTrack : interviewTracks[0];
   if (!track) notFound();
 
-  const nav = await getTrackNeighbors(id, track, true);
+  const nav = await getTrackNeighbors(id, track, true, sort);
 
   const trackLabel = track === "member" ? "General member application" : `Field team lead — ${track.slice("lead:".length)}`;
 
@@ -48,8 +49,8 @@ export default async function InterviewDetail({
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <Link href="/admin/interviews" className="text-[13px] text-muted hover:text-white">← Back to interview review</Link>
-        <ReviewNav base="/admin/interviews" track={track} {...nav} />
+        <Link href={`/admin/interviews?track=${encodeURIComponent(track)}${sort === "score" ? "&sort=score" : ""}`} className="text-[13px] text-muted hover:text-white">← Back to interview review</Link>
+        <ReviewNav base="/admin/interviews" track={track} sort={sort} {...nav} />
       </div>
       <div className="mt-4">
         <h1 className="t-card-title">{app.userName}</h1>

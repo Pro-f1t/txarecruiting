@@ -32,16 +32,17 @@ function Stat({ label, val, highlight }: { label: string; val: number | null | u
 }
 
 export default function ReviewBoard({
-  tracks, itemsByTrack, decisionStage = "review", detailBase = "/admin/review", advanceLabel = "Interview", dualScore = false,
+  tracks, itemsByTrack, decisionStage = "review", detailBase = "/admin/review", advanceLabel = "Interview", dualScore = false, initialSortByScore = false, initialTrack,
 }: {
   tracks: Track[]; itemsByTrack: Record<string, ReviewItem[]>;
   decisionStage?: "review" | "final"; detailBase?: string; advanceLabel?: string; dualScore?: boolean;
+  initialSortByScore?: boolean; initialTrack?: string;
 }) {
   const router = useRouter();
-  const [track, setTrack] = useState<string>(tracks[0]?.key ?? "");
+  const [track, setTrack] = useState<string>(initialTrack && tracks.some((t) => t.key === initialTrack) ? initialTrack : (tracks[0]?.key ?? ""));
   const [topN, setTopN] = useState<number>(0);
   const [busy, setBusy] = useState<string | null>(null);
-  const [sortByScore, setSortByScore] = useState(false);
+  const [sortByScore, setSortByScore] = useState(initialSortByScore);
   const [confirmClear, setConfirmClear] = useState(false);
 
   const rawItems = itemsByTrack[track] ?? [];
@@ -155,7 +156,7 @@ export default function ReviewBoard({
             style={{ background: "var(--color-surface)", border: it.decision === "advanced" ? "1px solid color-mix(in srgb, var(--color-ok) 45%, transparent)" : it.decision === "rejected" ? "1px solid color-mix(in srgb, var(--color-danger) 35%, transparent)" : "1px solid transparent" }}>
             <span className="w-6 shrink-0 text-center text-[14px] font-bold text-muted">{i + 1}</span>
 
-            <Link href={`${detailBase}/${it.appId}?track=${encodeURIComponent(track)}`} className="min-w-[160px] flex-1 group">
+            <Link href={`${detailBase}/${it.appId}?track=${encodeURIComponent(track)}${sortByScore ? "&sort=score" : ""}`} className="min-w-[160px] flex-1 group">
               <p className="text-[15px] font-semibold group-hover:text-accent">{it.name}</p>
               <p className="truncate text-[12px] text-muted">{it.email}</p>
               {it.teams && it.teams.length > 0 && (
@@ -180,7 +181,7 @@ export default function ReviewBoard({
               </div>
             )}
 
-            <Link href={`${detailBase}/${it.appId}?track=${encodeURIComponent(track)}`} className="pill pill-ghost !px-4 !py-1.5 !text-[13px]">Review</Link>
+            <Link href={`${detailBase}/${it.appId}?track=${encodeURIComponent(track)}${sortByScore ? "&sort=score" : ""}`} className="pill pill-ghost !px-4 !py-1.5 !text-[13px]">Review</Link>
 
             <div className="flex items-center gap-2">
               <button onClick={() => setDecision(it.appId, "advanced")} disabled={busy === `dec:${it.appId}`}

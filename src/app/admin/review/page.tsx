@@ -7,7 +7,8 @@ import { TEAMS } from "@/lib/models/User";
 import ReviewBoard, { type ReviewItem, type Track } from "@/components/ReviewBoard";
 import ScoringGuideCallout from "@/components/ScoringGuideCallout";
 
-export default async function AdminReview() {
+export default async function AdminReview({ searchParams }: { searchParams: Promise<{ sort?: string; track?: string }> }) {
+  const { sort, track: initialTrack } = await searchParams;
   let uid: string;
   try {
     ({ uid } = await requireApplicationReviewer());
@@ -78,7 +79,7 @@ export default async function AdminReview() {
         {tracks.length === 0 ? (
           <p className="t-body text-muted">No submitted applications to review yet.</p>
         ) : (
-          <ReviewBoard tracks={tracks} itemsByTrack={itemsByTrack} />
+          <ReviewBoard tracks={tracks} itemsByTrack={itemsByTrack} initialSortByScore={sort === "score"} initialTrack={initialTrack} />
         )}
       </div>
     </div>

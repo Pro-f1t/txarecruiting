@@ -13,7 +13,7 @@ export default async function ReviewDetail({
   params, searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ track?: string }>;
+  searchParams: Promise<{ track?: string; sort?: string }>;
 }) {
   let uid: string;
   try {
@@ -22,7 +22,8 @@ export default async function ReviewDetail({
     redirect(guardErrorStatus(e) === 403 ? "/admin" : "/auth/login");
   }
   const { id } = await params;
-  const { track: rawTrack } = await searchParams;
+  const { track: rawTrack, sort: rawSort } = await searchParams;
+  const sort = rawSort === "score" ? "score" : "submitted";
 
   const app = await getApplication(id);
   const applicant = await getUser(app?.userId ?? id);
@@ -33,7 +34,7 @@ export default async function ReviewDetail({
   const track = rawTrack && validTracks.includes(rawTrack) ? rawTrack : validTracks[0];
   if (!track) notFound();
 
-  const nav = await getTrackNeighbors(id, track, false);
+  const nav = await getTrackNeighbors(id, track, false, sort);
 
   const trackLabel = track === "member" ? "General member application" : `Field team lead — ${track.slice("lead:".length)}`;
 
@@ -45,8 +46,8 @@ export default async function ReviewDetail({
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <Link href="/admin/review" className="text-[13px] text-muted hover:text-white">← Back to review</Link>
-        <ReviewNav base="/admin/review" track={track} {...nav} />
+        <Link href={`/admin/review?track=${encodeURIComponent(track)}${sort === "score" ? "&sort=score" : ""}`} className="text-[13px] text-muted hover:text-white">← Back to review</Link>
+        <ReviewNav base="/admin/review" track={track} sort={sort} {...nav} />
       </div>
       <div className="mt-4">
         <h1 className="t-card-title">{app.userName}</h1>

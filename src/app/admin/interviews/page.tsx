@@ -5,7 +5,8 @@ import { ApplicationStatus } from "@/lib/models/Application";
 import { TEAMS } from "@/lib/models/User";
 import ReviewBoard, { type ReviewItem, type Track } from "@/components/ReviewBoard";
 
-export default async function AdminInterviews() {
+export default async function AdminInterviews({ searchParams }: { searchParams: Promise<{ sort?: string; track?: string }> }) {
+  const { sort, track: initialTrack } = await searchParams;
   const { uid } = await requireStaff();
   const [apps, interviewScores, reviewScores] = await Promise.all([getAllApplications(), getScores("interview"), getScores("review")]);
   const submitted = apps.filter((a) => a.status === ApplicationStatus.SUBMITTED);
@@ -66,7 +67,7 @@ export default async function AdminInterviews() {
         {tracks.length === 0 ? (
           <p className="t-body text-muted">No one has been advanced to interviews yet — mark applicants &ldquo;Interview&rdquo; in Application review first.</p>
         ) : (
-          <ReviewBoard tracks={tracks} itemsByTrack={itemsByTrack} decisionStage="final" detailBase="/admin/interviews" advanceLabel="Accept" dualScore />
+          <ReviewBoard tracks={tracks} itemsByTrack={itemsByTrack} decisionStage="final" detailBase="/admin/interviews" advanceLabel="Accept" dualScore initialSortByScore={sort === "score"} initialTrack={initialTrack} />
         )}
       </div>
     </div>

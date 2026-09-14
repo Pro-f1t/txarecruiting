@@ -9,12 +9,12 @@ import { useRouter } from "next/navigation";
  * review board. ← / → keys work too (ignored while typing in a field).
  */
 export default function ReviewNav({
-  base, track, prevId, nextId, index, total, prevName, nextName,
+  base, track, sort, prevId, nextId, index, total, prevName, nextName,
 }: {
-  base: string; track: string; prevId: string | null; nextId: string | null; index: number; total: number; prevName?: string; nextName?: string;
+  base: string; track: string; sort?: "submitted" | "score"; prevId: string | null; nextId: string | null; index: number; total: number; prevName?: string; nextName?: string;
 }) {
   const router = useRouter();
-  const href = (id: string) => `${base}/${id}?track=${encodeURIComponent(track)}`;
+  const href = (id: string) => `${base}/${id}?track=${encodeURIComponent(track)}${sort === "score" ? "&sort=score" : ""}`;
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -27,7 +27,7 @@ export default function ReviewNav({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [prevId, nextId, track, base]);
+  }, [prevId, nextId, track, base, sort]);
 
   const btn = "pill pill-ghost !px-4 !py-2 !text-[13px] inline-flex items-center gap-2";
   const disabled = "pointer-events-none opacity-35";
@@ -39,7 +39,7 @@ export default function ReviewNav({
       ) : (
         <span className={`${btn} ${disabled}`}>← Prev</span>
       )}
-      <span className="text-[13px] text-muted tabular-nums">{index + 1} of {total}</span>
+      <span className="text-[13px] text-muted tabular-nums">{index + 1} of {total}{sort === "score" && <span className="ml-1.5 text-[11px] uppercase tracking-wider">by score</span>}</span>
       {nextId ? (
         <Link href={href(nextId)} className="pill pill-blue !px-4 !py-2 !text-[13px] inline-flex items-center gap-2" title={nextName ? `Next: ${nextName} (→)` : "Next (→)"}>Next →</Link>
       ) : (
