@@ -19,6 +19,9 @@ export default function ReviewScorePanel({
   const [comment, setComment] = useState(myComment);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
+  // Application review hides other reviewers until you've scored (avoids anchoring) unless the
+  // stage is locked. Interviews are graded by two people concurrently, so nothing is hidden there.
+  const gated = stage === "review" && myScore == null && !locked;
 
   const save = async () => {
     if (score == null) { setMsg("Pick a score first."); return; }
@@ -52,12 +55,12 @@ export default function ReviewScorePanel({
     <div className="card p-7">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="t-eyebrow">Your rating</p>
-        {myScore != null || locked ? (
+        {gated ? (
+          <span className="text-[13px] text-muted">Score first to reveal others</span>
+        ) : (
           <span className="text-[13px] text-muted">
             Team average: <span className="font-semibold text-white">{avg != null ? avg.toFixed(1) : "-"}</span> · {others.length + (myScore != null ? 1 : 0)} score{others.length + (myScore != null ? 1 : 0) === 1 ? "" : "s"}
           </span>
-        ) : (
-          <span className="text-[13px] text-muted">Score first to reveal others</span>
         )}
       </div>
 
@@ -103,15 +106,14 @@ export default function ReviewScorePanel({
         {msg && <span className="text-[13px]" style={{ color: msg === "Saved" || msg === "Cleared" ? "var(--color-ok)" : "var(--color-danger)" }}>{msg}</span>}
       </div>
 
-      {/* Other reviewers - hidden until you submit your own score (avoids anchoring).
-          Once the stage is locked nothing can be influenced, so everyone can read them. */}
-      {myScore == null && !locked ? (
+      {/* Other reviewers */}
+      {gated ? (
         <div className="mt-6 flex items-center gap-2 border-t border-white/10 pt-5">
           <span className="text-[14px]" style={{ color: "var(--color-muted)" }}>🔒</span>
           <p className="text-[13px] text-muted">Other reviewers&apos; scores and comments unlock once you submit your own score.</p>
         </div>
       ) : others.length === 0 ? (
-        locked && <p className="mt-6 border-t border-white/10 pt-5 text-[13px] text-muted">No other reviewers scored this track.</p>
+        <p className="mt-6 border-t border-white/10 pt-5 text-[13px] text-muted">No other reviewers have scored this yet.</p>
       ) : (
         <div className="mt-6 border-t border-white/10 pt-5">
           <p className="text-[12px] uppercase tracking-wider text-muted">Other reviewers</p>

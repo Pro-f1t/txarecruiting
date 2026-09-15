@@ -33,7 +33,7 @@ export default function InterviewProcedureControl({ current }: { current: string
         <span className={`badge ${current ? "badge-ok" : "badge-muted"}`}>{current ? "Custom - shown to interviewers" : "Using the default"}</span>
       </div>
       <p className="t-body mt-2 text-muted">
-        Shown at the top of every applicant&apos;s Interview review page. Formatting: a blank line starts a new paragraph, lines starting with <span className="text-white">*</span> or <span className="text-white">-</span> are bullets, <span className="text-white">1.</span> lines are numbered, and <span className="text-white">**text**</span> is bold (use it for must-ask questions).
+        Shown at the top of every applicant&apos;s Interview review page. Formatting: a blank line starts a new paragraph, lines starting with <span className="text-white">*</span> or <span className="text-white">-</span> are bullets, <span className="text-white">1.</span> or <span className="text-white">1]</span> lines are numbered, and <span className="text-white">**text**</span> is bold (use it for must-ask questions).
       </p>
       <textarea rows={16} value={text} onChange={(e) => setText(e.target.value)}
         className="mt-4 w-full resize-y rounded-2xl px-4 py-3 font-mono text-[13px] leading-relaxed text-white outline-none"

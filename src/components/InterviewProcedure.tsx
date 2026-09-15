@@ -17,8 +17,8 @@ export default function InterviewProcedure({ text }: { text: string }) {
           if (lines.every((l) => /^\s*[*-]\s+/.test(l))) {
             return <ul key={bi} className="list-disc space-y-1 pl-5">{lines.map((l, li) => <li key={li}><Inline text={l.replace(/^\s*[*-]\s+/, "")} /></li>)}</ul>;
           }
-          if (lines.every((l) => /^\s*\d+[.)]\s+/.test(l))) {
-            return <ol key={bi} className="list-decimal space-y-1.5 pl-6">{lines.map((l, li) => <li key={li}><Inline text={l.replace(/^\s*\d+[.)]\s+/, "")} /></li>)}</ol>;
+          if (lines.every((l) => /^\s*\d+[.)\]]\s+/.test(l))) {
+            return <ol key={bi} className="list-decimal space-y-1.5 pl-6">{lines.map((l, li) => <li key={li}><Inline text={l.replace(/^\s*\d+[.)\]]\s+/, "")} /></li>)}</ol>;
           }
           return <p key={bi} className="whitespace-pre-wrap">{lines.map((l, li) => <span key={li}>{li > 0 && <br />}<Inline text={l} /></span>)}</p>;
         })}
