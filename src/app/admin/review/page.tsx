@@ -78,10 +78,7 @@ export default async function AdminReview({ searchParams }: { searchParams: Prom
       {locked && (
         <div className="mt-6 flex items-start gap-3 rounded-2xl p-4" style={{ background: "color-mix(in srgb, var(--color-danger) 12%, transparent)", border: "1px solid var(--color-danger)" }}>
           <span className="text-[16px]" style={{ color: "var(--color-danger)" }}>🔒</span>
-          <div>
-            <p className="text-[14px] font-bold" style={{ color: "var(--color-danger)" }}>Application review is locked</p>
-            <p className="mt-0.5 text-[13px] text-muted">Interview invites have been released, so scores and Interview/Reject decisions are read-only - changing them now would change what applicants already see. An admin can move the recruiting step back to Reviewing from Overview to unlock.</p>
-          </div>
+          <p className="text-[14px] font-bold" style={{ color: "var(--color-danger)" }}>Application review is locked</p>
         </div>
       )}
       <div className="mt-6"><ScoringGuideCallout mine={mine} /></div>

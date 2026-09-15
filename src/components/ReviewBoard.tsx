@@ -47,11 +47,14 @@ export default function ReviewBoard({
   const [sortByScore, setSortByScore] = useState(initialSortByScore);
   const [confirmClear, setConfirmClear] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
+  const [q, setQ] = useState("");
 
 
   const rawItems = itemsByTrack[track] ?? [];
   const scoreOf = (it: ReviewItem) => (dualScore ? overall(it.priorAvg, it.avg) : it.avg) ?? -1;
-  const items = sortByScore ? [...rawItems].sort((a, b) => scoreOf(b) - scoreOf(a)) : rawItems;
+  const sorted = sortByScore ? [...rawItems].sort((a, b) => scoreOf(b) - scoreOf(a)) : rawItems;
+  const needle = q.trim().toLowerCase();
+  const items = needle ? sorted.filter((it) => `${it.name} ${it.email}`.toLowerCase().includes(needle)) : sorted;
 
   // Mass-email lists for the track currently selected: GM tab → GM decisions,
   // a lead tab → that lead track's decisions.
@@ -128,9 +131,15 @@ export default function ReviewBoard({
         ))}
       </div>
 
-      <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
+      <div className="mt-5">
+        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search name or email…"
+          className="w-full max-w-md rounded-2xl px-4 py-2.5 text-[14px] text-white outline-none"
+          style={{ background: "var(--color-surface-2)", border: "1px solid rgba(255,255,255,0.1)" }} />
+      </div>
+
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
         <p className="text-[13px] text-muted">
-          {items.length} applicants · {advancedCount} advancing
+          {needle ? `${items.length} of ${sorted.length} applicants` : `${items.length} applicants`} · {advancedCount} advancing
           {unscored > 0 && <span style={{ color: "var(--color-warn)" }}> · {unscored} not scored by you</span>}
         </p>
         <div className="flex items-center gap-3">
@@ -191,7 +200,7 @@ export default function ReviewBoard({
       </div>
 
       <div className="mt-4 space-y-2">
-        {items.length === 0 && <p className="t-body text-muted">No applicants in this track.</p>}
+        {items.length === 0 && <p className="t-body text-muted">{needle ? `No applicants match "${q.trim()}".` : "No applicants in this track."}</p>}
         {items.map((it, i) => (
           <div key={it.appId} className="flex flex-wrap items-center gap-4 rounded-2xl p-4"
             style={{ background: "var(--color-surface)", border: it.decision === "advanced" ? "1px solid color-mix(in srgb, var(--color-ok) 45%, transparent)" : it.decision === "rejected" ? "1px solid color-mix(in srgb, var(--color-danger) 35%, transparent)" : "1px solid transparent" }}>
