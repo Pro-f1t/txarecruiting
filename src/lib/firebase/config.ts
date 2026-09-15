@@ -68,6 +68,17 @@ export async function getInterviewMessage(): Promise<string | null> {
   return message && message.trim() ? message : null;
 }
 
+/** Interviewer procedure shown at the top of every interview review page (config/interviews.procedure). */
+export async function getInterviewProcedure(): Promise<string | null> {
+  const doc = await adminDb.doc("config/interviews").get();
+  const v = doc.exists ? (doc.data()?.procedure as string | undefined) : undefined;
+  return v && v.trim() ? v : null;
+}
+
+export async function setInterviewProcedure(procedure: string, by: string): Promise<void> {
+  await adminDb.doc("config/interviews").set({ procedure: procedure.trim(), procedureUpdatedAt: new Date(), procedureUpdatedBy: by }, { merge: true });
+}
+
 export async function setInterviewMessage(message: string, by: string): Promise<void> {
   await adminDb.doc("config/interviews").set({ message: message.trim(), updatedAt: new Date(), updatedBy: by }, { merge: true });
 }

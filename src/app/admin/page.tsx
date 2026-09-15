@@ -1,16 +1,17 @@
 import { requireStaff } from "@/lib/auth/guard";
 import { getAllApplications } from "@/lib/firebase/applications";
-import { getRecruitingStep, getInterviewMessage, getStepSchedule } from "@/lib/firebase/config";
+import { getRecruitingStep, getInterviewMessage, getStepSchedule, getInterviewProcedure } from "@/lib/firebase/config";
 import { ApplicationStatus } from "@/lib/models/Application";
 import { STEP_LABELS, RecruitingStep, isAtOrPast } from "@/lib/models/Config";
 import { UserRole } from "@/lib/models/User";
 import StepControl from "@/components/StepControl";
 import InterviewMessageControl from "@/components/InterviewMessageControl";
+import InterviewProcedureControl from "@/components/InterviewProcedureControl";
 
 export default async function AdminOverview() {
   const { user } = await requireStaff();
   const isAdmin = user.role === UserRole.ADMIN;
-  const [apps, step, interviewMessage, schedule] = await Promise.all([getAllApplications(), getRecruitingStep(), getInterviewMessage(), getStepSchedule()]);
+  const [apps, step, interviewMessage, schedule, procedure] = await Promise.all([getAllApplications(), getRecruitingStep(), getInterviewMessage(), getStepSchedule(), getInterviewProcedure()]);
 
   const submitted = apps.filter((a) => a.status === ApplicationStatus.SUBMITTED);
   const drafts = apps.filter((a) => a.status === ApplicationStatus.IN_PROGRESS);
@@ -66,6 +67,7 @@ export default async function AdminOverview() {
       )}
 
       <InterviewMessageControl current={interviewMessage} live={isAtOrPast(step, RecruitingStep.INTERVIEWING)} />
+      <InterviewProcedureControl current={procedure} />
     </div>
   );
 }

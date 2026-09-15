@@ -3,11 +3,13 @@ import { notFound } from "next/navigation";
 import { requireStaff } from "@/lib/auth/guard";
 import { getApplication, getTrackNeighbors } from "@/lib/firebase/applications";
 import { getUser } from "@/lib/firebase/users";
-import { getConversationsForApplicant } from "@/lib/firebase/conversations";
 import { getScoresForAppTrack } from "@/lib/firebase/scores";
 import ApplicationAnswers from "@/components/ApplicationAnswers";
 import ReviewScorePanel from "@/components/ReviewScorePanel";
 import ReviewNav from "@/components/ReviewNav";
+import InterviewProcedure from "@/components/InterviewProcedure";
+import { getInterviewProcedure } from "@/lib/firebase/config";
+import { DEFAULT_INTERVIEW_PROCEDURE } from "@/lib/interviewProcedure";
 
 export default async function InterviewDetail({
   params, searchParams,
@@ -21,8 +23,7 @@ export default async function InterviewDetail({
   const sort = rawSort === "score" ? "score" : "submitted";
 
   const app = await getApplication(id);
-  const applicant = await getUser(app?.userId ?? id);
-  const conversations = await getConversationsForApplicant(app?.userId ?? id);
+  const [applicant, procedure] = await Promise.all([getUser(app?.userId ?? id), getInterviewProcedure()]);
   if (!app) notFound();
 
   // Only tracks the applicant was advanced to interview for.
@@ -64,7 +65,10 @@ export default async function InterviewDetail({
       </div>
 
       <div className="mt-6 grid gap-8 lg:grid-cols-[1.3fr_1fr] lg:items-start">
-        <ApplicationAnswers app={app} attendedEventIds={applicant?.attendedEventIds ?? []} conversations={conversations} />
+        <div className="space-y-8">
+          <InterviewProcedure text={procedure ?? DEFAULT_INTERVIEW_PROCEDURE} />
+          <ApplicationAnswers app={app} attendedEventIds={applicant?.attendedEventIds ?? []} showContext={false} />
+        </div>
         <div className="lg:sticky lg:top-24">
           <ReviewScorePanel appId={id} track={track} stage="interview" myScore={mine?.score ?? null} myComment={mine?.comment ?? ""} others={others} avg={avg} priorAvg={priorAvg} />
         </div>

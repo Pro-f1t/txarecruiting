@@ -45,7 +45,7 @@ function LinkRow({ label, url }: { label: string; url?: string }) {
 }
 
 /** Read-only view of an application's answers + an embedded resume viewer. */
-export default function ApplicationAnswers({ app, attendedEventIds = [], conversations = [] }: { app: Application; attendedEventIds?: string[]; conversations?: Conversation[] }) {
+export default function ApplicationAnswers({ app, attendedEventIds = [], conversations = [], showContext = true }: { app: Application; attendedEventIds?: string[]; conversations?: Conversation[]; /** Event attendance + Conversations cards (off on interview review). */ showContext?: boolean }) {
   const fd = app.formData;
   const major = [fd.major, fd.major2].filter(Boolean).join(" & ");
   const fullName = [fd.firstName, fd.lastName].filter(Boolean).join(" ");
@@ -56,6 +56,7 @@ export default function ApplicationAnswers({ app, attendedEventIds = [], convers
 
   return (
     <div className="space-y-8">
+      {showContext && (<>
       <div className="card p-7">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="t-eyebrow">Event attendance</p>
@@ -99,6 +100,7 @@ export default function ApplicationAnswers({ app, attendedEventIds = [], convers
           <p className="t-body mt-4 text-muted">No one has logged a conversation with this applicant yet.</p>
         )}
       </div>
+      </>)}
 
       <div className="card p-7">
         <p className="t-eyebrow">Application</p>
