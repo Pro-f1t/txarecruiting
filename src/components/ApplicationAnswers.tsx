@@ -25,6 +25,17 @@ function QA({ label, value, max }: { label: string; value?: string; max?: number
     </div>
   );
 }
+/** File extension from a Firebase download URL's object path (or plain URL path). */
+function fileExt(url: string): string {
+  try {
+    const u = new URL(url);
+    const m = u.pathname.match(/\/o\/([^?]+)/);
+    const objectPath = m ? decodeURIComponent(m[1]) : u.pathname;
+    return (objectPath.match(/\.([a-z0-9]{2,5})$/i)?.[1] ?? "").toLowerCase();
+  } catch { return ""; }
+}
+const FILE_LABEL: Record<string, string> = { doc: "Word document (.doc)", docx: "Word document (.docx)", pages: "Pages document", txt: "Text file", rtf: "Rich text file", png: "PNG image", jpg: "JPEG image", jpeg: "JPEG image" };
+
 function hostOf(url: string): string {
   try { return new URL(url).hostname.replace(/^www\./, ""); } catch { return url; }
 }
@@ -153,9 +164,20 @@ export default function ApplicationAnswers({ app, attendedEventIds = [], convers
           {fd.resumeUrl && <a href={fd.resumeUrl} target="_blank" rel="noreferrer" className="text-[13px] text-accent hover:underline">Open in new tab ↗</a>}
         </div>
         {fd.resumeUrl ? (
-          <object data={fd.resumeUrl} type="application/pdf" className="mt-4 h-[600px] w-full rounded-2xl" style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
-            <p className="t-body mt-4 text-muted">Preview unavailable in this browser. <a href={fd.resumeUrl} target="_blank" rel="noreferrer" className="text-accent">Open the PDF ↗</a></p>
-          </object>
+          fileExt(fd.resumeUrl) === "pdf" || fileExt(fd.resumeUrl) === "" ? (
+            <object data={fd.resumeUrl} type="application/pdf" className="mt-4 h-[600px] w-full rounded-2xl" style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
+              <p className="t-body mt-4 text-muted">Preview unavailable in this browser. <a href={fd.resumeUrl} target="_blank" rel="noreferrer" className="text-accent">Open the PDF ↗</a></p>
+            </object>
+          ) : (
+            // Not a PDF: browsers can't render it inline and would auto-download it, so show a card instead.
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-4 rounded-2xl p-5" style={{ background: "var(--color-surface-2)", border: "1px solid rgba(255,255,255,0.08)" }}>
+              <div className="min-w-0">
+                <p className="text-[14px] font-medium">{FILE_LABEL[fileExt(fd.resumeUrl)] ?? `${fileExt(fd.resumeUrl).toUpperCase()} file`}</p>
+                <p className="mt-0.5 text-[12px] text-muted">Can&apos;t be previewed in the browser - download it to read it. The applicant uploaded this instead of a PDF.</p>
+              </div>
+              <a href={fd.resumeUrl} download target="_blank" rel="noreferrer" className="pill pill-blue !px-4 !py-2 !text-[13px] shrink-0">Download ↓</a>
+            </div>
+          )
         ) : (
           <p className="t-body mt-4 text-muted">No resume uploaded.</p>
         )}

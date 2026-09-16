@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import ScoringGuideCallout from "@/components/ScoringGuideCallout";
 
@@ -19,6 +19,69 @@ export default function ReviewScorePanel({
   const [comment, setComment] = useState(myComment);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
+
+  // ── Autosave ────────────────────────────────────────────────────────────
+  // 1) A local draft of the comment (and score) survives navigation/refresh
+  //    even before a score is picked.  2) Once both a score and a comment
+  //    exist, changes are saved to the server ~1.5s after you stop typing.
+  const draftKey = `score-draft:${appId}:${track}:${stage}`;
+  const [saveState, setSaveState] = useState<"idle" | "dirty" | "saving" | "saved" | "error">("idle");
+  const [savedAt, setSavedAt] = useState<Date | null>(null);
+  const lastSaved = useRef<string>(JSON.stringify({ score: myScore, comment: myComment }));
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Restore a local draft on mount (only if it's newer than what the server has).
+  useEffect(() => {
+    if (locked) return;
+    try {
+      const raw = localStorage.getItem(draftKey);
+      if (!raw) return;
+      const d = JSON.parse(raw) as { score: number | null; comment: string };
+      if (d.comment !== myComment || d.score !== myScore) {
+        if (typeof d.comment === "string") setComment(d.comment);
+        if (typeof d.score === "number" || d.score === null) setScore(d.score);
+        setSaveState("dirty");
+      }
+    } catch { /* ignore */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const persist = async (s: number, c: string): Promise<boolean> => {
+    const res = await fetch(`/api/admin/applications/${appId}/score`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ track, stage, score: s, comment: c }),
+    });
+    return res.ok;
+  };
+
+  // Debounced autosave whenever score/comment change.
+  useEffect(() => {
+    if (locked) return;
+    const snapshot = JSON.stringify({ score, comment });
+    if (snapshot === lastSaved.current) return;
+    try { localStorage.setItem(draftKey, snapshot); } catch { /* ignore */ }
+    setSaveState("dirty");
+    if (score == null || comment.trim().length === 0) return; // can't save to the server yet
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = setTimeout(async () => {
+      setSaveState("saving");
+      try {
+        const ok = await persist(score, comment);
+        if (ok) {
+          lastSaved.current = snapshot;
+          try { localStorage.removeItem(draftKey); } catch { /* ignore */ }
+          setSavedAt(new Date());
+          setSaveState("saved");
+        } else {
+          setSaveState("error");
+        }
+      } catch {
+        setSaveState("error");
+      }
+    }, 1500);
+    return () => { if (timer.current) clearTimeout(timer.current); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [score, comment, locked]);
   // Application review hides other reviewers until you've scored (avoids anchoring) unless the
   // stage is locked. Interviews are graded by two people concurrently, so nothing is hidden there.
   const gated = stage === "review" && myScore == null && !locked;
@@ -34,6 +97,9 @@ export default function ReviewScorePanel({
       });
       const body = await res.json();
       if (!res.ok) { setMsg(body.error || "Failed."); return; }
+      lastSaved.current = JSON.stringify({ score, comment });
+      try { localStorage.removeItem(draftKey); } catch { /* ignore */ }
+      setSavedAt(new Date()); setSaveState("saved");
       setMsg("Saved");
       router.refresh();
       setTimeout(() => setMsg(null), 2000);
@@ -47,7 +113,13 @@ export default function ReviewScorePanel({
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ track, stage, clear: true }),
       });
-      if (res.ok) { setScore(null); setComment(""); setMsg("Cleared"); router.refresh(); setTimeout(() => setMsg(null), 2000); }
+      if (res.ok) {
+        setScore(null); setComment("");
+        lastSaved.current = JSON.stringify({ score: null, comment: "" });
+        try { localStorage.removeItem(draftKey); } catch { /* ignore */ }
+        setSaveState("idle");
+        setMsg("Cleared"); router.refresh(); setTimeout(() => setMsg(null), 2000);
+      }
     } finally { setBusy(false); }
   };
 
@@ -95,7 +167,18 @@ export default function ReviewScorePanel({
       </div>
 
       <label className="mt-5 block">
-        <span className="mb-2 block text-[13px] text-muted">Comment <span className="text-danger">*</span></span>
+        <span className="mb-2 flex items-center justify-between text-[13px] text-muted">
+          <span>Comment <span className="text-danger">*</span></span>
+          {!locked && (
+            <span className="text-[12px]" style={{ color: saveState === "error" ? "var(--color-danger)" : saveState === "saved" ? "var(--color-ok)" : "var(--color-muted)" }}>
+              {saveState === "saving" ? "Saving…"
+                : saveState === "saved" && savedAt ? `Autosaved ${savedAt.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`
+                : saveState === "error" ? "Autosave failed - use Save"
+                : saveState === "dirty" ? (score == null ? "Draft kept here - pick a score to save" : "Unsaved changes…")
+                : ""}
+            </span>
+          )}
+        </span>
         <textarea rows={7} value={comment} onChange={(e) => setComment(e.target.value)} disabled={locked} placeholder="What stood out (good or bad), specific examples from their answers, and any reservations. Other reviewers will read this."
           className="w-full resize-y rounded-2xl px-4 py-3 text-[14px] leading-relaxed text-white outline-none" style={{ background: "var(--color-surface-2)", border: "1px solid rgba(255,255,255,0.1)", minHeight: 168 }} />
       </label>

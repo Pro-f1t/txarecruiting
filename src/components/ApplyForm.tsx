@@ -68,6 +68,10 @@ export default function ApplyForm({
 
   const upload = async (folder: string, file: File, setName: (s: string) => void, key: string) => {
     setError(null);
+    if (folder === "resumes") {
+      const isPdf = file.type === "application/pdf" || /\.pdf$/i.test(file.name);
+      if (!isPdf) { setError("Your resume must be a PDF. Export your Word doc as PDF (File → Save As → PDF) and upload that."); return; }
+    }
     setUploading(true);
     try {
       const url = await uploadFile(folder, uid, file);
